@@ -20,6 +20,14 @@ config file can change between versions. It is also possible to use Snakemake/Co
 
 To install Snakemake follow this guide (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
+Note: Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake (and other bioinformatics workflow tools) can become
+complicated very quickly when using many different wilcards and when integrating into an HPC environment like SLURM. We have provided small BAM	and MTX files that serve as examples on how to build the
+manifest, config, and profile for SC-MSI. Any editing of the pipeline to include new rules, file formats, etc., will require an experienced Snakemake user.
+
+### SC-MSI quick use guide
+
+
+
 
 
 
