@@ -1,1 +1,6 @@
-# had to remove SRR12397032 from manifest file, as it for some reason fails to finish running with scATOMIC
+#This README contains information on how to structure the manifest files for use with the SC-MSI Snakemake pipeline. 
+
+## Matrix file format
+
+
+## BAM file format
