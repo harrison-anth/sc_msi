@@ -1,12 +1,13 @@
 # SC-MSI
-## Computational pipeline to assess intratumoral heterogeneity of microsatellite instability status in single-cell data
-
-### Submitted to *Cancer Research*
+## Computational pipeline to identify MSI-H cells and measure heterogeneity in the biomarker
 
 ### Information about the author(s) of this code:
 Name(s): Harrison Anthony 
 contact information: h dot anthony1 at universityofgalway dot ie
 (Alternate contacts can be found on my github profile)
+
+### License information
+MIT; see LICENSE file for more information.
 
 ## Repository information
 
@@ -15,10 +16,13 @@ repository (https://github.com/harrison-anth/sc_msi_legacy)
 
 ### Before use
 
-The SC-MSI pipeline is verified to work on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2. Other Snakemake versions will work with this pipeline, but the variables in the example
-config file can change between versions. It is also possible to use Snakemake/Conda on other operating systems, but we have not (and do not plan to) initialize the pipline outside of Linux.
+This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2. 
 
-To install Snakemake follow this guide (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+First be sure to have Conda or Mamba installed (https://docs.conda.io/en/latest/)
+
+Then install Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+
+That's it!
 
 Note: Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake (and other bioinformatics workflow tools) can become
 complicated very quickly when using many different wilcards and when integrating into an HPC environment like SLURM. We have provided small BAM	and MTX files that serve as examples on how to build the
