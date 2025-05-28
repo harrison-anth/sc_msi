@@ -7,7 +7,7 @@ contact information: h dot anthony1 at universityofgalway dot ie
 (Alternate contacts can be found on my github profile)
 
 ### License information
-MIT; see LICENSE file for more information.
+MIT with attribution and commercial use restriction; see LICENSE file for more information.
 
 ## Repository information
 
@@ -18,9 +18,11 @@ repository (https://github.com/harrison-anth/sc_msi_legacy)
 
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2. 
 
-First be sure to have Conda or Mamba installed (https://docs.conda.io/en/latest/)
-
-Then install Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+Dependencies: 
+Conda/Mamba installed (https://docs.conda.io/en/latest/)
+Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
+Reference transcriptome
 
 That's it!
 
@@ -29,6 +31,9 @@ complicated very quickly when using many different wilcards and when integrating
 manifest, config, and profile for SC-MSI. Any editing of the pipeline to include new rules, file formats, etc., will require an experienced Snakemake user.
 
 ### SC-MSI quick use guide
+
+
+
 
 
 
