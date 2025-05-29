@@ -1,5 +1,6 @@
-#my snakemake run command
-#snakemake -s handle_bams.snake12 --profile ../conda_envs/slurm_profile/ --rerun-incomplete --rerun-triggers mtime --latency-wait 120
+# SC-MSI Snakemake pipeline for use with BAM files
+# Example command to run
+#snakemake -s handle_bams.snake --rerun-incomplete --rerun-triggers mtime --latency-wait 120
 
 #print snakemake dag
 #snakemake --forceall --rulegraph | dot -Tpdf > dag.pdf
@@ -9,19 +10,11 @@
 #import libraries
 import pandas as pd
 
-#helpful to include this if Snakemake is using too make cluster cores on the headnode (probably just due to my version)
-import os
-os.environ['OPENBLAS_NUM_THREADS'] = '1'
-
-
 #define config file
-configfile: "bam_config_udpated.yaml"
-#2 sample test file:
-#configfile: "bam_config_test.yaml"
+configfile: "bam_config.yaml"
 
 with open(config["sample_list"]) as samples_tmp:
 	samples=samples_tmp.read().splitlines()
-
 
 #read in patient list
 with open(config["patient_list"]) as patient_id:
@@ -34,13 +27,8 @@ patient_key=pd.read_table(config["patient_key"])
 
 rule all:
 	input:
-		expand("../images/{sample_name}_cell_types.pdf",sample_name=samples),
-		expand("../images/{sample_name}_msi_plots.pdf",sample_name=samples),
-		expand("../integrated_samples/{patient}.rds",patient=patients),
-		expand("/data3/hanthony/infer_cnv_temp/sample_{sample_name}/infercnv.png",sample_name=samples),
-		expand("/data3/hanthony/infer_cnv_temp/patient_{patient}/infercnv.png",patient=patients),
-		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients)
-#		expand("../patient_reports/{patient}.html",patient=patients)
+		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
+		expand("../patient_reports/{patient}.html",patient=patients)
 
 
 rule cellranger:
@@ -77,80 +65,6 @@ rule cellranger:
 		--localcores {threads}
 
 		mv {params.temp_dir} {params.final_dir}
-		"""
-
-rule sensor2_global:
-	input:
-		tumor={rules.cellranger.output.raw_bam}
-	output:
-		"../sensor2_results/{sample_name}_msi_status"
-	params:
-		models=config["sensor2_models"],
-		ms_loci=config["ms_loci"]
-	conda:
-		"pro"
-	shell:
-		"""
-		msisensor2 msi -d {params.ms_loci} -t {input.tumor} -M {params.models} -c 5 \
-		-o ../sensor2_results/{wildcards.sample_name}_msi_status
-		rm ../sensor2_results/{wildcards.sample_name}_msi_status_dis
-		rm ../sensor2_results/{wildcards.sample_name}_msi_status_somatic
-		"""
-
-rule sensor_pro_global:
-	input:
-		tumor={rules.cellranger.output.raw_bam}
-	output:
-		"../pro_results/{sample_name}_msi_status"
-	params:
-		baseline=config["pro_baseline"]
-	conda:
-		"pro"
-	shell:
-		"""
-		msisensor-pro pro -d {params.baseline} -t {input.tumor} \
-		-o ../pro_results/{wildcards.sample_name}_msi_status
-		rm ../pro_results/{wildcards.sample_name}_msi_status_all
-		rm ../pro_results/{wildcards.sample_name}_msi_status_dis
-		rm ../pro_results/{wildcards.sample_name}_msi_status_unstable
-		"""
-
-rule msings_global:
-	input:
-		tumor={rules.cellranger.output.raw_bam}
-	output:
-		"../msings_results/{sample_name}_msi_status.MSI_Analysis.txt"
-	params:
-		baseline=config["msings_baseline"],
-		msings=config["msings_path"],
-		msings_bed=config["msings_loci"],
-		ref=config["hg38"],
-		multiplier=config["multiplier"],
-		min=config["msi_min_threshold"],
-		max=config["msi_max_threshold"],
-		outdir="../temp/{sample_name}"
-	resources:
-		mem="0G"
-	conda:
-		"msings"
-	shell:
-		"""
-		mkdir -p ../temp/{wildcards.sample_name}
-		
-		samtools mpileup -f {params.ref} -d 100000 -A -E -l {params.msings_bed} {input.tumor} \
-		| awk '{{if($4 >= 6) print $0}}' > {params.outdir}/{wildcards.sample_name}.mpileup
-		
-		{params.msings} analyzer {params.outdir}/{wildcards.sample_name}.mpileup {params.msings_bed} \
-		-o {params.outdir}/{wildcards.sample_name}.msi.txt
-		
-		{params.msings} count_msi_samples {params.baseline} {params.outdir} \
-		-m {params.multiplier} -t {params.min} {params.max} \
-		-o ../msings_results/{wildcards.sample_name}_msi_status.MSI_Analysis.txt
-
-		if [[ -f ../msings_results/{wildcards.sample_name}_msi_status.MSI_Analysis.txt ]]
-		then
-		rm -r {params.outdir}
-		fi
 		"""
 
 rule process_sample:
@@ -204,6 +118,7 @@ rule sensor_rna:
 		msisensor-rna detection -i ../temp/{wildcards.sample_name}.csv -o ../sensor_rna_results/{wildcards.sample_name}.txt \
 		-m ../temp/{wildcards.sample_name}.model -d True
 		"""
+
 rule split_cigar:
 	input:
 		{rules.cellranger.output.raw_bam}
@@ -227,150 +142,6 @@ rule split_cigar:
 		mv ../bam/{wildcards.sample_name}.vcf_ready.bai ../bam/{wildcards.sample_name}.vcf_ready.bam.bai
 		"""
 
-rule mutect2:
-	input:
-		{rules.split_cigar.output}
-	output:
-		vcf="../vcf/{sample_name}_raw.vcf.gz"
-	conda:
-		"vcftools"
-	threads: 12
-	resources:
-		mem=0
-	params:
-		ref=config["vcf_ref"],
-		pon=config["pon"],
-		gnome=config["gnome"]
-	shell:
-		"""	
-		gatk Mutect2 \
-		-R {params.ref} \
-		-I {input} \
-		--panel-of-normals {params.pon} \
-		--native-pair-hmm-threads {threads} \
-		-O {output.vcf}
-		"""
-
-rule filter_vcf:
-	input:
-		{rules.mutect2.output.vcf}
-	output:
-		filtered_vcf="../vcf/{sample_name}.filtered.final.vcf.gz",
-		snv_loci="../vartrix_results/{sample_name}.snv_loci.txt"
-	conda:
-		"vcftools"
-	params:
-		ref=config["vcf_ref"],
-		filt_temp="../vcf/{sample_name}.filtered.vcf.gz"
-	shell:
-		r"""
-		gatk FilterMutectCalls \
-		-V {input} \
-		-R {params.ref} \
-		-O {params.filt_temp}
-
-		vcftools --gzvcf {params.filt_temp} \
-		--recode --remove-filtered-all \
-		--stdout | gzip -c > {output.filtered_vcf}
-
-		#prep vcf for use with vartrix
-		zcat {output.filtered_vcf} | awk '{{print $1,$2}}' > ../vartrix_results/{wildcards.sample_name}.snv_loci.txt
-		sed -i 's/\s/:/g' ../vartrix_results/{wildcards.sample_name}.snv_loci.txt
-		"""
-
-rule annotate_variants:
-	input:
-		vcf={rules.filter_vcf.output.filtered_vcf}
-	output:
-		"../annovar_results/{sample_name}.avinput.variant_function"
-	params:
-		avinput="../annovar_results/{sample_name}.avinput"
-	conda:
-		"vcftools"
-	shell:
-		"""
-		#convert vcf to annovar format
-		perl ../temp/annovar/convert2annovar.pl -format vcf4 {input.vcf} > {params.avinput}
-		#annoatte variants
-		perl ../temp/annovar/annotate_variation.pl -geneanno -dbtype refGene -buildver hg38 {params.avinput} ../temp/annovar/humandb/
-		#filter variants
-		perl  ../temp/annovar/annotate_variation.pl -filter -dbtype exac03 -buildver hg38 {params.avinput} ../temp/annovar/humandb/
-		"""
-
-rule vartrix:
-	input:
-		vcf={rules.filter_vcf.output.filtered_vcf},
-		barcodes={rules.process_sample.output.just_barcodes},
-		bam={rules.split_cigar.output},
-		s_obj="../filtered_h5/{sample_name}.rds",
-		annotations={rules.annotate_variants.output}
-	output:
-		ref_mat="../vartrix_results/{sample_name}_ref_matrix.mmx",
-		alt_mat="../vartrix_results/{sample_name}_alt_matrix.mmx",
-		genos_mat="../vartrix_results/{sample_name}_genos_matrix.mmx"
-	conda:
-		"seurat"
-	threads: 10
-	resources:
-		mem="30G"
-	params:
-		ref=config["vcf_ref"]
-	shell:
-		"""
-		vartrix -v {input.vcf} -b {input.bam} -f {params.ref} -c \
-		{input.barcodes} --out-matrix ../vartrix_results/{wildcards.sample_name}_alt_matrix.mmx \
-		--log-level info --threads {threads} \
-		--ref-matrix ../vartrix_results/{wildcards.sample_name}_ref_matrix.mmx \
-		--out-variants ../vartrix_results/{wildcards.sample_name}_var_list.tsv \
-		--scoring-method coverage \
-		--mapq 25
-
-		vartrix -v {input.vcf} -b {input.bam} -f {params.ref} -c \
-		{input.barcodes} --out-matrix ../vartrix_results/{wildcards.sample_name}_frac_matrix.mmx \
-		--log-level info --threads {threads} \
-		--scoring-method alt_frac \
-		--mapq 25
-		
-		vartrix -v {input.vcf} -b {input.bam} -f {params.ref} -c \
-		{input.barcodes} --out-matrix ../vartrix_results/{wildcards.sample_name}_genos_matrix.mmx \
-		--log-level info --threads {threads} \
-		--scoring-method consensus \
-		--mapq 25
-		"""
-rule plot_muts:
-	input:
-		{rules.vartrix.output.ref_mat},
-		{rules.vartrix.output.alt_mat},
-		{rules.vartrix.output.genos_mat}
-	output:
-		"../images/{sample_name}_muts.pdf"
-	conda:
-		"seurat"
-	resources:
-		mem="20G"
-	shell:
-		"""
-		Rscript vartrix_coverage2.R {wildcards.sample_name}
-		"""
-
-rule plot_ccf:
-	input:
-		{rules.vartrix.output.ref_mat},
-		{rules.vartrix.output.alt_mat},
-		{rules.vartrix.output.genos_mat},
-		{rules.filter_vcf.output.snv_loci},
-		{rules.annotate_variants.output}
-	output:
-		"../images/{sample_name}_ccf.pdf"
-	conda:
-		"seurat"
-	resources:
-		mem="35G"
-	shell:
-		"""
-		Rscript ccf_gedder.R {wildcards.sample_name}
-		"""
-                
 def get_list_of_bams(wildcards):
 	ck_output = checkpoints.split_bam.get(sample_name=wildcards.sample_name).output[0]
 	with open(ck_output) as f:
@@ -401,114 +172,9 @@ checkpoint split_bam:
 		find ../bam/{wildcards.sample_name}/*.bam -printf "%f\n" > ../temp/{wildcards.sample_name}_temp_bams.txt
 		"""
 
-rule process_splits:
-	input:
-		"../temp/{sample_name}_temp_bams.txt",
-		lambda wildcards: expand("../bam/{sample_name}/{bam}.bam",sample_name={wildcards.sample_name},bam=get_list_of_bams(wildcards))
-	output:
-		"../bam/{sample_name}/{bam}.bam.bai"
-	params:
-		bam="../bam/{sample_name}/{bam}.bam"
-	conda:
-		"rusty"
-	shell:
-		"""
-		samtools view -H {params.bam} |  sed "s/SM:[^\t]*/SM:"{wildcards.bam}.bam"/g" \
-		| samtools reheader - {params.bam} > {params.bam}.bam
-		mv {params.bam}.bam {params.bam}
-		samtools index {params.bam}
-		touch ../bam/{wildcards.sample_name}/*.bai
-		sleep 500
-		touch ../bam/{wildcards.sample_name}/*.bai
-		"""
-
-rule pro_local:
-	input:
-		lambda wildcards: expand("../bam/{sample_name}/{bam}.bam.bai",sample_name={wildcards.sample_name},bam= get_list_of_bams(wildcards))
-	output:
-		"../pro_results/{sample_name}_cluster_{bam}"
-	params:
-		tumor="../bam/{sample_name}/{bam}.bam",
-		baseline=config["pro_baseline"]
-	conda:
-		"pro"
-	shell:
-		"""
-		msisensor-pro pro -d {params.baseline} -t {params.tumor} \
-		-o ../pro_results/{wildcards.sample_name}_cluster_{wildcards.bam}
-		rm ../pro_results/{wildcards.sample_name}_cluster_{wildcards.bam}_all
-		rm ../pro_results/{wildcards.sample_name}_cluster_{wildcards.bam}_dis
-		rm ../pro_results/{wildcards.sample_name}_cluster_{wildcards.bam}_unstable
-		"""
-
-rule sensor2_local:
-	input:
-		lambda wildcards: expand("../bam/{sample_name}/{bam}.bam.bai",sample_name={wildcards.sample_name},bam= get_list_of_bams(wildcards))
-	output:
-		"../sensor2_results/{sample_name}_cluster_{bam}"
-	params:
-		tumor="../bam/{sample_name}/{bam}.bam",
-		models=config["sensor2_models"],
-		ms_loci=config["ms_loci"]
-	conda:
-		"pro"
-	shell:
-		"""
-		msisensor2 msi -d {params.ms_loci} -t {params.tumor} -M {params.models} -c 5 \
-		-o ../sensor2_results/{wildcards.sample_name}_cluster_{wildcards.bam}
-		rm ../sensor2_results/{wildcards.sample_name}_cluster_{wildcards.bam}_dis
-		rm ../sensor2_results/{wildcards.sample_name}_cluster_{wildcards.bam}_somatic
-		"""
-
-rule msings_local:
-	input:
-		lambda wildcards: expand("../bam/{sample_name}/{bam}.bam.bai",sample_name={wildcards.sample_name},
-					bam=get_list_of_bams(wildcards))
-	output:
-		"../msings_results/{sample_name}_cluster_{bam}.MSI_Analysis.txt"
-	params:
-		tumor="../bam/{sample_name}/{bam}.bam",
-		baseline=config["msings_baseline"],
-		msings=config["msings_path"],
-		msings_bed=config["msings_loci"],
-		ref=config["hg38"],
-		multiplier=config["multiplier"],
-		min=config["msi_min_threshold"],
-		max=config["msi_max_threshold"],
-		outdir="../temp/{sample_name}_{bam}"
-	conda:
-		"msings2"
-	resources:
-		mem=0
-	shell:
-		"""
-		mkdir -p {params.outdir}
-
-		samtools mpileup -f {params.ref} -d 100000 -A -E -l {params.msings_bed} {params.tumor} \
-		| awk '{{if($4 >= 6) print $0}}' > {params.outdir}/{wildcards.sample_name}_{wildcards.bam}.mpileup
-
-		{params.msings} analyzer {params.outdir}/{wildcards.sample_name}_{wildcards.bam}.mpileup {params.msings_bed} \
-		-o {params.outdir}/{wildcards.sample_name}_{wildcards.bam}.msi.txt
-
-		{params.msings} count_msi_samples {params.baseline} {params.outdir} -m {params.multiplier} -t {params.min} {params.max} \
-		-o ../msings_results/{wildcards.sample_name}_cluster_{wildcards.bam}.MSI_Analysis.txt
-
-		if [[ -f ./msings_results/{wildcards.sample_name}_cluster_{wildcards.bam}.MSI_Analysis.txt ]]
-		then
-		rm -r {params.outdir}
-		fi
-		"""
-
 checkpoint annotate_h5:
 	input:
-		lambda wildcards: expand("../pro_results/{sample_name}_cluster_{bam}", sample_name={wildcards.sample_name}, bam=get_list_of_bams(wildcards)),
-		lambda wildcards: expand("../sensor2_results/{sample_name}_cluster_{bam}", sample_name={wildcards.sample_name}, bam=get_list_of_bams(wildcards)),
-		lambda wildcards: expand("../msings_results/{sample_name}_cluster_{bam}.MSI_Analysis.txt", sample_name={wildcards.sample_name}, bam=get_list_of_bams(wildcards)),
 		"../atomic/{sample_name}.rds",
-		"../sensor_rna_results/{sample_name}.txt",
-		"../msings_results/{sample_name}_msi_status.MSI_Analysis.txt",
-		"../pro_results/{sample_name}_msi_status",
-		"../sensor2_results/{sample_name}_msi_status",
 		"../sensor_rna_results/{sample_name}.txt"
 	output:
 		"../annotated_h5/{sample_name}.rds"
@@ -531,6 +197,7 @@ rule create_plots:
 		"""
 		Rscript plot_all_bamog.R {wildcards.sample_name}
 		"""
+
 rule infercnv:
 	input:
 		"../annotated_h5/{sample_name}.rds"

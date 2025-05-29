@@ -1,0 +1,10 @@
+jobs: 70
+executor: slurm
+show-failed-logs: True
+verbose: True
+default-resources:
+    slurm_account: "genomics"
+    slurm_partition: "normal,highmem,MSC"
+    mem_mb_per_cpu: 5000
+    runtime: "48h"
+use-conda: True
