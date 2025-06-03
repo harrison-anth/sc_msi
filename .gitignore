@@ -11,7 +11,6 @@ decrypted/*
 delete_me/*
 encrypted/*
 error_files/*
-fastq/*
 filtered_h5/*
 gsm_samps/*
 integrated_samples/*
