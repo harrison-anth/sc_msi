@@ -1,4 +1,4 @@
-#### Config file for BAM files ####
+#### Config file for FASTQ/BAM files ####
 
 # edit the following parameters below. Note the curent sample list must consist of FASTQ (.fastq) files. They also must follow the Illumina FASTQ naming convention.
 
