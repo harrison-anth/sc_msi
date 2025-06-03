@@ -27,7 +27,7 @@ pandas (https://pandas.pydata.org/)
 
 Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 
-Reference transcriptome
+Reference transcriptome (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)
 
 That's it!
 
@@ -39,11 +39,18 @@ and could very well affect the functionality of the pipeline.
 
 ### SC-MSI quick use guide
 
+1.) Verify installation by running the test sample. 
+
+``` 
+
+
+
 If you have FASTQ files:
 
 1.) Supply a manifest file that specifies the location of your FASTQ files and a key that has information on which samples should be integrated together (see the manifest directory for examples).
 
 2.)  
+
 
 
 

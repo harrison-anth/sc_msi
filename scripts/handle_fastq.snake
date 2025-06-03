@@ -1,17 +1,15 @@
-# SC-MSI Snakemake pipeline for use with BAM files
+#### SC-MSI Snakemake pipeline for use with BAM files ####
+
 # Example command to run
-#snakemake -s handle_bams.snake --rerun-incomplete --rerun-triggers mtime --latency-wait 120
+#snakemake -s handle_fastq.snake ---rerun-incomplete --rerun-triggers mtime --latency-wait 120
 
-#print snakemake dag
-#snakemake --forceall --rulegraph | dot -Tpdf > dag.pdf
-
-# workflow - SC-MSI
+#### BEGIN WORKFLOW ####
 
 #import libraries
 import pandas as pd
 
 #define config file
-configfile: "bam_config.yaml"
+configfile: "fastq_config.yaml"
 
 with open(config["sample_list"]) as samples_tmp:
 	samples=samples_tmp.read().splitlines()
@@ -36,10 +34,6 @@ rule cellranger:
 	output:
 		raw_bam="../cell_ranger_output/{sample_name}/outs/possorted_genome_bam.bam",
 		matrix="../cell_ranger_output/{sample_name}/outs/filtered_feature_bc_matrix.h5"
-	threads: 16
-	resources:
-		mem=0
-
 	params:
 		cellranger=config["cellranger"],
 		ref=config["transcriptome"],
@@ -95,8 +89,6 @@ rule find_cancer:
 		"../atomic/{sample_name}.rds"
 	conda:
 		"atomic"
-	resources:
-		mem="0G"
 	shell:
 		"""
 		Rscript atomic.R {wildcards.sample_name}
@@ -112,7 +104,6 @@ rule sensor_rna:
 	shell:
 		"""
 		Rscript sensor_rna_shaper.R {wildcards.sample_name}
-		conda deactivate
 		training_model=../temp/{wildcards.sample_name}_training_model.csv
 		msisensor-rna train -i $training_model -m ../temp/{wildcards.sample_name}.model -t PanCancer
 		msisensor-rna detection -i ../temp/{wildcards.sample_name}.csv -o ../sensor_rna_results/{wildcards.sample_name}.txt \
