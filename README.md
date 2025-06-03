@@ -9,10 +9,18 @@ contact information: h dot anthony1 at universityofgalway dot ie
 ### License information
 MIT; see LICENSE file for more information.
 
-## Repository information
+### Repository information
 
 This repository functions as a distribution of the SC-MSI Snakemake pipeline used in our recept manuscript. The results and raw code used in the manuscript can be found in the legacy version of this
-repository (https://github.com/harrison-anth/sc_msi_legacy)
+repository (https://github.com/harrison-anth/sc_msi_legacy).
+
+### Planned pipeline improvements
+
+* Create separate files for each rule to help users incorporate multi-threading
+
+* Combine FASTQ/MTX file workflows with automatic file detection
+
+ 
 
 ### Before use
 
@@ -41,80 +49,18 @@ and could very well affect the functionality of the pipeline.
 
 1.) Verify installation by running the test sample. 
 
-``` 
+``` snakemake -s handle_fastq.snake ```
 
+2.) Edit the settings in the config file to replace the default test settings
 
+FASTQ files -- handle_fastq.config
 
-If you have FASTQ files:
+MTX files -- handle_mtx.config
 
-1.) Supply a manifest file that specifies the location of your FASTQ files and a key that has information on which samples should be integrated together (see the manifest directory for examples).
+Note: There is a separate README in the manifests/ directory that describes each config file and how to create them. 
 
-2.)  
+3.) Run the pipeline
 
+MTX files -- ``` snakemake -s handle_mtx.snake ```
 
-
-
-
-
-
-
-### Conda environments
-The conda_envs folder contains all conda environments used for data handling and all MSI tools.
-
-sensor.yml was used to run MSIsensor MSIsensor2 and MSIsensor-pro
-
-msings.yml was used to run mSINGS
-
-MSIR.yml was used to run R code
-
-mantis.yml was used to run MANTIS
-
-vcf2maf.yml was used to convert from vcf file format to maf file format (note even with this environment, vcf2maf is notoriously finicky and will require 
-a working local installation of VEP)
-
-### Publication results
-The TCGA results and scripts required to generate them are included in the tcga/ folder alongside a separate README.md
- detailing the pipeline. 
-
-The results of all non-TCGA datasets are in the non_tcga/ folder. Each separate dataset has its own subfolder and README.md. 
-
-### Graphs
-
-All the code necessary to generate the graphs used in the paper are stored in the manuscript_graphs/ directory. The Rmarkdown files
-used cater to my local paths and settings but can be adapated by any experienced R user. 
-All graphs were generated using R version 4.1.2
-
-### Baselines and reference files
-
-The reference files are available from the GDC (https://gdc.cancer.gov/about-data/gdc-data-processing/gdc-reference-files)
-
-The baselines created for each tool and used in this study are included in the baselines/ directory. 
-
-### Test example
-
-To ensure reproducibility of the results and quick implementation of our pipelines for other researchers who want to use these tools, we have included
-a test example that allows for the user to quickly use each MSI tool on small BAM and gene count matrices that have been subset down to only the microsatellites found on 
-chromosome 7. See the test/ directory for a separate README.md related to their use. 
-
-
-
-Please feel free to reach out with any questions if this README has not answered your questions. 
-
-
-
-
-
-# single_msi
-Single cell rna-seq MSI tests to explore heterogeneity in MSI status as biomarker.
-
-#data sources
-
-6 scRNA samples from PRJNA932556
-
-4 scRNA samples from PRJNA796219
-
-8 scRNA samples from PRJNA650549
-
-41 scRNA samples from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE163558
-
-40 samples from https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE205506
+FASTQ files -- ``` snakemake -s handle_fastq.snake ```
