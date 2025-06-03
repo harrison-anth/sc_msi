@@ -7,7 +7,7 @@ contact information: h dot anthony1 at universityofgalway dot ie
 (Alternate contacts can be found on my github profile)
 
 ### License information
-MIT with attribution and commercial use restriction; see LICENSE file for more information.
+MIT; see LICENSE file for more information.
 
 ## Repository information
 
@@ -41,7 +41,9 @@ and could very well affect the functionality of the pipeline.
 
 If you have FASTQ files:
 
-1.) Supply a manifest file that specifies the location of your FASTQ files and the 
+1.) Supply a manifest file that specifies the location of your FASTQ files and a key that has information on which samples should be integrated together (see the manifest directory for examples).
+
+2.)  
 
 
 
