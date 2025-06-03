@@ -19,17 +19,23 @@ repository (https://github.com/harrison-anth/sc_msi_legacy)
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2. 
 
 Dependencies: 
-Conda/Mamba installed (https://docs.conda.io/en/latest/)
+Conda/Mamba (https://docs.conda.io/en/latest/)
+
 Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+
 pandas (https://pandas.pydata.org/)
+
 Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
+
 Reference transcriptome
 
 That's it!
 
-Note: Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake (and other bioinformatics workflow tools) can become
-complicated very quickly when using many different wilcards and when integrating into an HPC environment like SLURM. We have provided small BAM	and MTX files that serve as examples on how to build the
-manifest, config, and profile for SC-MSI. Any editing of the pipeline to include new rules, file formats, etc., will require an experienced Snakemake user.
+Note: Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake 
+(and other bioinformatics workflow tools) can become complicated very quickly when using many different wilcards 
+and when being integrated into an HPC framework like SLURM. We have provided small BAM	and MTX files that serve as examples on how to build the
+manifest, config, and profile for SC-MSI. An experienced Snakemake user would be needed to include changes to the pipeline (new rules, file formats, etc.,) 
+and could very well affect the functionality of the pipeline. 
 
 ### SC-MSI quick use guide
 
