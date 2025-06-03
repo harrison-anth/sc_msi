@@ -21,6 +21,7 @@ This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24
 Dependencies: 
 Conda/Mamba installed (https://docs.conda.io/en/latest/)
 Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+pandas (https://pandas.pydata.org/)
 Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 Reference transcriptome
 
@@ -32,7 +33,9 @@ manifest, config, and profile for SC-MSI. Any editing of the pipeline to include
 
 ### SC-MSI quick use guide
 
+If you have FASTQ files:
 
+1.) Supply a manifest file that specifies the location of your FASTQ files and the 
 
 
 
