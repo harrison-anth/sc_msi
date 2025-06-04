@@ -1,7 +1,7 @@
 #### SC-MSI Snakemake pipeline for use with FASTQ/BAM files ####
 
 # Example command to run #
-# snakemake -s handle_fastq.snake ---rerun-incomplete --rerun-triggers mtime --latency-wait 120
+# snakemake -s handle_fastq.snake --cores 1 --use-conda 
 
 #### BEGIN WORKFLOW ####
 
