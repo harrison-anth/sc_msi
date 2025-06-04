@@ -109,29 +109,6 @@ rule sensor_rna:
 		-m ../temp/{wildcards.sample_name}.model -d True
 		"""
 
-rule split_cigar:
-	input:
-		{rules.cellranger.output.raw_bam}
-	output:
-		"../bam/{sample_name}.vcf_ready.bam"
-	conda:
-		"vcftools"
-	params:
-		ref=config["vcf_ref"]
-	resources:
-		mem="0G"
-	shell:
-		"""
-		module load java
-
-		gatk SplitNCigarReads \
-		-R {params.ref} \
-		-I {input} \
-		-O {output}
-
-		mv ../bam/{wildcards.sample_name}.vcf_ready.bai ../bam/{wildcards.sample_name}.vcf_ready.bam.bai
-		"""
-
 def get_list_of_bams(wildcards):
 	ck_output = checkpoints.split_bam.get(sample_name=wildcards.sample_name).output[0]
 	with open(ck_output) as f:
