@@ -63,11 +63,15 @@ rule process_sample:
 		all_barcodes="../pseudobulk_barcodes/{sample_name}/{sample_name}_all_cell_barcodes.tsv",
 		just_barcodes="../pseudobulk_barcodes/{sample_name}/just_barcodes.tsv",
 		filtered_h5="../filtered_h5/{sample_name}.rds"
+	params:
+		key=config["patient_key"],
+		mtx='N',
+		seed=0
 	conda:
-		"../conda_envs/seurat.yml"
+		"seurat"
 	shell:
 		"""
-		Rscript barcode_generator.R {wildcards.sample_name} 'N'
+		Rscript barcode_generator.R {wildcards.sample_name} {params.key} {params.mtx} {params.seed}
 		if [[ ! -f ../pseudobulk_barcodes/{wildcards.sample_name}/just_barcodes.tsv ]]
 		then
 		cut -f 1 ../pseudobulk_barcodes/{wildcards.sample_name}/{wildcards.sample_name}_all_cell_barcodes.tsv > \
@@ -81,11 +85,13 @@ rule find_cancer:
 	output:
 		"../pseudobulk_barcodes/{sample_name}/{sample_name}_cancer_barcodes.tsv",
 		"../atomic/{sample_name}.rds"
+	params:
+		seed=0,
 	conda:
-		"../conda_envs/atomic.yml"
+		"atomic"
 	shell:
 		"""
-		Rscript atomic.R {wildcards.sample_name} {threads}
+		Rscript atomic.R {wildcards.sample_name} {threads} {params.seed}
 		"""
 
 rule sensor_rna:
@@ -94,13 +100,13 @@ rule sensor_rna:
 	output:
 		"../sensor_rna_results/{sample_name}.txt"
 	conda:
-		"../conda_envs/seurat.yml"
+		"seurat.yml"
 	shell:
 		"""
 		Rscript sensor_rna_shaper.R {wildcards.sample_name}
-		training_model=../temp/{wildcards.sample_name}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{wildcards.sample_name}.model -t PanCancer
-		msisensor-rna detection -i ../temp/{wildcards.sample_name}.csv -o ../sensor_rna_results/{wildcards.sample_name}.txt \
+		training_model=../references/{wildcards.sample_name}_training_model.csv
+		msisensor-rna train -i $training_model -m ../references/{wildcards.sample_name}.model -t PanCancer
+		msisensor-rna detection -i ../references/{wildcards.sample_name}.csv -o ../sensor_rna_results/{wildcards.sample_name}.txt \
 		-m ../temp/{wildcards.sample_name}.model -d True
 		"""
 
@@ -118,138 +124,8 @@ checkpoint annotate_h5:
 	output:
 		"../annotated_h5/{sample_name}.rds"
 	conda:
-		"../conda_envs/seurat.yml"
+		"seurat"
 	shell:
 		"""
 		Rscript annotate_bamog.R {wildcards.sample_name}
 		"""
-
-rule create_plots:
-	input:
-		"../annotated_h5/{sample_name}.rds"
-	output:
-		"../images/{sample_name}_cell_types.pdf",
-		"../images/{sample_name}_msi_plots.pdf"
-	conda:
-		"seurat"
-	shell:
-		"""
-		Rscript plot_all_bamog.R {wildcards.sample_name}
-		"""
-
-rule infercnv:
-	input:
-		"../annotated_h5/{sample_name}.rds"
-	output:
-		"/data3/hanthony/infer_cnv_temp/sample_{sample_name}/infercnv.png"
-	params:
-		outdir="/data3/hanthony/infer_cnv_temp/sample_{sample_name}/"
-	threads: 5
-	resources:
-		mem="30G"
-	conda:
-		"seurat"
-	shell:
-		"""
-		Rscript infer_cnv.R {wildcards.sample_name} {params.outdir}
-		mkdir -p ../images/{wildcards.sample_name}_cnv/
-		cp {params.outdir}*.png ../images/{wildcards.sample_name}_cnv/
-		"""
-
-
-def match_patient_samples(wildcards):
-	indv_key = patient_key[patient_key['patient_id'].str.contains(wildcards.patient)]
-	matched_annotated_samples="../annotated_h5/" +indv_key['filename'].values +".rds"
-	return matched_annotated_samples
-
-rule integrate_data:
-	input:
-		match_patient_samples
-	output:
-		int_data="../integrated_samples/{patient}.rds",
-		canc_data="../integrated_samples/{patient}_cancer.rds"
-	threads: 20
-	resources:
-		mem="0G"
-	conda:
-		"atomic"
-	shell:
-		"""
-		Rscript integrate_all4.R {wildcards.patient} 'N'
-		"""
-rule int_msi:
-	input:
-		{rules.integrate_data.output.int_data}
-	output:
-		"../sensor_rna_results/int_{patient}.txt"
-	shell:
-		"""
-		training_model=../temp/{wildcards.patient}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{wildcards.patient}.model -t PanCancer
-		msisensor-rna detection -i ../temp/{wildcards.patient}.csv \
-		-o ../sensor_rna_results/int_{wildcards.patient}.txt -m ../temp/{wildcards.patient}.model -d True
-		"""
-
-rule canc_int_msi:
-	input:
-		"../integrated_samples/{patient}_cancer.rds"
-	output:
-		"../sensor_rna_results/int_{patient}_cancer.txt"
-	params:
-		p_name="{patient}_cancer"
-	shell:
-		"""
-		training_model=../temp/{params.p_name}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{params.p_name}.model -t PanCancer
-		msisensor-rna detection -i ../temp/{params.p_name}.csv \
-		-o ../sensor_rna_results/int_{params.p_name}.txt -m ../temp/{params.p_name}.model -d True
-		"""
-
-rule infercnv_patient:
-	input:
-		"../integrated_samples/{patient}.rds"
-	output:
-		"/data3/hanthony/infer_cnv_temp/patient_{patient}/infercnv.png"
-	params:
-		outdir="/data3/hanthony/infer_cnv_temp/patient_{patient}/"
-	threads: 16
-	resources:
-		mem="0G"
-	conda:
-		"seurat"
-	shell:
-		"""
-		Rscript infer_patient_cnv.R {wildcards.patient} {params.outdir}
-		mkdir -p ../images/{wildcards.patient}_cnv/
-		cp {params.outdir}*.png ../images/{wildcards.patient}_cnv/
-		"""
-
-rule summary_stats:
-	input:
-		{rules.infercnv_patient.output},
-		{rules.integrate_data.output.int_data}
-	output:
-		"../summary_stats/{patient}_cluster_stats.tsv"
-	resources:
-		mem="0G"
-	conda:
-		"seurat"
-	shell:
-		"""
-		Rscript get_summary_stats2.R {wildcards.patient} "N"
-		"""
-rule patient_report:
-	input:
-		"../integrated_samples/{patient}.rds",
-		"../integrated_samples/{patient}_cancer.rds",
-		{rules.int_msi.output},
-		{rules.canc_int_msi.output}
-	output:
-		"../patient_reports/{patient}.html"
-	conda:
-		"atomic"
-	shell:
-		"""
-		Rscript patient_report_generator.R {wildcards.patient}
-		"""
-
