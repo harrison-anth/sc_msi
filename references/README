@@ -1,0 +1,4 @@
+#### Information regarding the references/ directory ####
+
+If using FASTQ files for the SC-MSI pipeline, you must provide a reference transcriptome. The hg38 pipeline is readily available from several websites. You can 
+download it from 10X genomics here: https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads
