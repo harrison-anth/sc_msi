@@ -15,4 +15,4 @@ patient_key: "../manifests/fastq_example_key.tsv"
 transcriptome: "../references/refdata-gex-GRCh38-2020-A"
 
 #cellranger path
-cellranger: "/install_dir/cellranger-7.2.0/cellranger"
+cellranger: "/home/administrator/cellranger-9.0.1/bin/cellranger"
