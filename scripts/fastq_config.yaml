@@ -1,6 +1,5 @@
 #### Config file for FASTQ/BAM files ####
-# Edit the following parameters below. #
-# Note: the sample list must consist of FASTQ (.fastq) files. They must follow the Illumina FASTQ naming convention. #
+# Edit the following parameters below: #
 
 # specify list of sample names
 sample_list: "../manifests/fastq_example_sample_file.txt"
