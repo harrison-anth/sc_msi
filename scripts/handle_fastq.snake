@@ -22,7 +22,6 @@ with open(config["patient_list"]) as patient_id:
 patient_key=pd.read_table(config["patient_key"])
 
 
-
 rule all:
 	input:
 		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),

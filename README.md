@@ -32,8 +32,6 @@ Conda/Mamba (https://docs.conda.io/en/latest/)
 
 Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
-pandas (https://pandas.pydata.org/)
-
 Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 
 Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads) 
