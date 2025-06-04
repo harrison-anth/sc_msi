@@ -20,12 +20,14 @@ repository (https://github.com/harrison-anth/sc_msi_legacy).
 
 * Combine FASTQ/MTX file workflows with automatic file detection
 
+* Include small reference transcriptome to verify installation
 
 ### Before use
 
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2. 
 
 Dependencies: 
+
 Conda/Mamba (https://docs.conda.io/en/latest/)
 
 Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
@@ -34,7 +36,7 @@ pandas (https://pandas.pydata.org/)
 
 Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 
-Reference transcriptome (https://www.ncbi.nlm.nih.gov/datasets/genome/GCF_000001405.26/)
+Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads) 
 
 That's it!
 
