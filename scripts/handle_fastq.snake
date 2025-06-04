@@ -64,7 +64,7 @@ rule process_sample:
 		just_barcodes="../pseudobulk_barcodes/{sample_name}/just_barcodes.tsv",
 		filtered_h5="../filtered_h5/{sample_name}.rds"
 	conda:
-		"seurat"
+		"../seurat.yml"
 	shell:
 		"""
 		mkdir -p ../pseudobulk_barcodes/{wildcards.sample_name}
@@ -83,7 +83,7 @@ rule find_cancer:
 		"../pseudobulk_barcodes/{sample_name}/{sample_name}_cancer_barcodes.tsv",
 		"../atomic/{sample_name}.rds"
 	conda:
-		"atomic"
+		"../conda_envs/atomic.yml"
 	shell:
 		"""
 		Rscript atomic.R {wildcards.sample_name}
