@@ -47,7 +47,7 @@ Create the conda environments stored in the conda_envs/ directory:
 
 That's it!
 
-Note: Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake 
+**Note:** Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake 
 (and other bioinformatics workflow tools) can become complicated very quickly when using many different wilcards 
 and when being integrated into an HPC framework like SLURM. We have provided small FASTQ and MTX files that serve as examples on how to build the
 manifest, config, and profile for SC-MSI. An experienced Snakemake user would be needed to include changes to the pipeline (new rules, file formats, etc.,) 
