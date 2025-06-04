@@ -20,7 +20,6 @@ repository (https://github.com/harrison-anth/sc_msi_legacy).
 
 * Combine FASTQ/MTX file workflows with automatic file detection
 
- 
 
 ### Before use
 
@@ -41,7 +40,7 @@ That's it!
 
 Note: Snakemake is a great workflow manager because it is transferable across platforms, scalabale with HPC's, and reproducible. However, Snakemake 
 (and other bioinformatics workflow tools) can become complicated very quickly when using many different wilcards 
-and when being integrated into an HPC framework like SLURM. We have provided small BAM	and MTX files that serve as examples on how to build the
+and when being integrated into an HPC framework like SLURM. We have provided small FASTQ and MTX files that serve as examples on how to build the
 manifest, config, and profile for SC-MSI. An experienced Snakemake user would be needed to include changes to the pipeline (new rules, file formats, etc.,) 
 and could very well affect the functionality of the pipeline. 
 
