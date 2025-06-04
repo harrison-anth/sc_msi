@@ -27,7 +27,6 @@ rule all:
 		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
 		expand("../patient_reports/{patient}.html",patient=patients)
 
-
 rule cellranger:
 	input:
 	output:
@@ -36,7 +35,6 @@ rule cellranger:
 	params:
 		cellranger=config["cellranger"],
 		ref=config["transcriptome"],
-		temp_dir="/data3/hanthony/cell_ranger_output/{sample_name}/",
 		final_dir="../cell_ranger_output/{sample_name}/"
 	conda:
 		 "base"
@@ -54,10 +52,8 @@ rule cellranger:
 		mkdir -p {params.temp_dir}
 
 		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../fastq/ \
-		--sample={wildcards.sample_name} --output-dir {params.temp_dir} \
+		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
 		--localcores {threads}
-
-		mv {params.temp_dir} {params.final_dir}
 		"""
 
 rule process_sample:
