@@ -14,6 +14,8 @@ MIT; see LICENSE file for more information.
 This repository functions as a distribution of the SC-MSI Snakemake pipeline used in our recept manuscript. The results and raw code used in the manuscript can be found in the legacy version of this
 repository (https://github.com/harrison-anth/sc_msi_legacy).
 
+This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2.
+
 ### Planned pipeline improvements
 
 * Create separate files for each rule to help users incorporate multi-threading
@@ -22,19 +24,26 @@ repository (https://github.com/harrison-anth/sc_msi_legacy).
 
 * Include small reference transcriptome to verify installation
 
-### Before use
+* Containerize workflow to optionally not install each software
 
-This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24.1.2. 
+### Installation instructions
 
-Dependencies: 
+Download and install the following dependencies: 
 
 Conda/Mamba (https://docs.conda.io/en/latest/)
-
+https://github.com/abelson-lab/scATOMIC
 Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
 Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 
-Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads) 
+Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
+
+Create the conda environments stored in the conda_envs/ directory:
+
+```conda env create -f atomic.yml```
+
+```conda env create -f seurat.yml```
+
 
 That's it!
 
@@ -60,6 +69,10 @@ Note: There is a separate README in the manifests/ directory that describes each
 
 3.) Run the pipeline
 
+FASTQ files -- ``` snakemake -s handle_fastq.snake --cores 1 --use-conda ```
+
 MTX files -- ``` snakemake -s handle_mtx.snake ```
 
-FASTQ files -- ``` snakemake -s handle_fastq.snake ```
+These are the very basic possible commands with Snakemake. It is recommended to take time to create a custom Snakemake profile to 
+store user settings that enable multi-threading/multi-core processing. There are also many RAM intense applications (Cellranger and InferCNV) 
+that will require tweaking the memory settings for each rule to fit the system settings.
