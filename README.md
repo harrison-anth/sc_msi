@@ -31,14 +31,14 @@ This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1 and Conda 24
 Download and install the following dependencies: 
 
 1.) Conda/Mamba (https://docs.conda.io/en/latest/)
-https://github.com/abelson-lab/scATOMIC
-Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
-2.) Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
+2.) Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
-3.) Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
+3.) Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 
-4.) Create the conda environments stored in the conda_envs/ directory:
+4.) Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
+
+5.) Create the conda environments stored in the conda_envs/ directory:
 
 ```conda env create -f atomic.yml```
 
