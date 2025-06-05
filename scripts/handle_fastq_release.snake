@@ -24,7 +24,7 @@ patient_key=pd.read_table(config["patient_key"])
 
 rule all:
 	input:
-		expand("../images/{sample_name}_cell_types.pdf",sample_name=samples)
+		expand("../reports/{sample_name}_sample_report.pdf",sample_name=samples)
 #		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
 #		expand("../patient_reports/{patient}.html",patient=patients)
 
@@ -134,8 +134,7 @@ rule create_sample_plots:
 	input:
 		{rules.annotate_h5.output}
 	output:
-		"../images/{sample_name}_cell_types.pdf",
-		"../images/{sample_name}_msi_plots.pdf"
+		"../reports/{sample_name}_sample_report.pdf"
 	conda:
 		"seurat"
 	shell:
