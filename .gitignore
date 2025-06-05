@@ -30,4 +30,4 @@ infercnv_results/*
 scripts/*.mro
 scripts/.*
 scripts/.*/*
-references/refdata-gex-GRCh38-2020-A/
+references/refdata-gex-GRCh38-2024-A/
