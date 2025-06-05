@@ -101,7 +101,7 @@ rule sensor_rna:
 	output:
 		"../sensor_rna_results/{sample_name}.txt"
 	conda:
-		"seurat.yml"
+		"seurat"
 	shell:
 		"""
 		Rscript sensor_rna_shaper.R {wildcards.sample_name}
