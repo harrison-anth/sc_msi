@@ -132,7 +132,7 @@ checkpoint annotate_h5:
 		"""
 rule create_sample_plots:
 	input:
-		{checkpoint.annotate_h5.output}
+		{checkpoints.annotate_h5.output}
 	output:
 		"../images/{sample_name}_cell_types.pdf",
 		"../images/{sample_name}_msi_plots.pdf"
