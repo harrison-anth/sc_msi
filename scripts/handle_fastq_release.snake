@@ -118,7 +118,7 @@ def get_list_of_bams(wildcards):
 	return bams
 
 
-checkpoint annotate_h5:
+rule annotate_h5:
 	input:
 		"../atomic/{sample_name}.rds",
 		"../sensor_rna_results/{sample_name}.txt"
@@ -130,9 +130,10 @@ checkpoint annotate_h5:
 		"""
 		Rscript annotate_bamog.R {wildcards.sample_name}
 		"""
+
 rule create_sample_plots:
 	input:
-		{checkpoints.annotate_h5.output}
+		{rules.annotate_h5.output}
 	output:
 		"../images/{sample_name}_cell_types.pdf",
 		"../images/{sample_name}_msi_plots.pdf"
