@@ -24,8 +24,9 @@ patient_key=pd.read_table(config["patient_key"])
 
 rule all:
 	input:
-		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
-		expand("../patient_reports/{patient}.html",patient=patients)
+		expand("../images/{sample_name}_cell_types.pdf",sample_name=samples)
+#		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
+#		expand("../patient_reports/{patient}.html",patient=patients)
 
 rule cellranger:
 	input:
@@ -129,3 +130,16 @@ checkpoint annotate_h5:
 		"""
 		Rscript annotate_bamog.R {wildcards.sample_name}
 		"""
+rule create_sample_plots:
+	input:
+		{checkpoint.annotate_h5.output}
+	output:
+		"../images/{sample_name}_cell_types.pdf",
+		"../images/{sample_name}_msi_plots.pdf"
+	conda:
+		"seurat"
+	shell:
+		"""
+		Rscript plot_all_bamog.R {wildcards.sample_name}
+		"""
+
