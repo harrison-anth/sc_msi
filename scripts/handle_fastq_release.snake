@@ -39,15 +39,16 @@ rule cellranger:
 		final_dir="../cell_ranger_output/{sample_name}/"
 	shell:
 		"""
-# this step helps re-run Cellranger if the job doesn't complete.
+#### this step helps re-run Cellranger if the job doesn't complete.
 		if [[ -d {params.final_dir} ]]
 		then
 		rm -r {params.final_dir}
 		fi
 
 		mkdir -p {params.final_dir}
+####
 
-		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --create-bam true --fastqs=../fastq/ \
+		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../fastq/ \
 		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
 		--localcores {threads}
 		"""

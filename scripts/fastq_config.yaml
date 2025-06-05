@@ -1,5 +1,9 @@
 #### Config file for FASTQ/BAM files ####
-# Edit the following parameters below: #
+
+# Note: Seeds for each run are adjustable in the handle_fastq.snake file. 
+
+
+# Edit the following parameters below to match your filenames #
 
 # specify list of sample names
 sample_list: "../manifests/fastq_example_sample_file.txt"
@@ -14,4 +18,4 @@ patient_key: "../manifests/fastq_example_key.tsv"
 transcriptome: "../references/refdata-gex-GRCh38-2024-A"
 
 #cellranger path
-cellranger: "/home/administrator/cellranger-9.0.1/bin/cellranger"
+cellranger: "/home/administrator/cellranger-7.2.0/bin/cellranger"
