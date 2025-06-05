@@ -41,16 +41,13 @@ rule cellranger:
 		 "base"
 	shell:
 		"""
-		if [[ -d {params.temp_dir} ]]
-		then
-		rm -r {params.temp_dir}
-		fi
+# this step helps re-run Cellranger if the job doesn't complete.
 		if [[ -d {params.final_dir} ]]
 		then
 		rm -r {params.final_dir}
 		fi
 
-		mkdir -p {params.temp_dir}
+		mkdir -p {params.final_dir}
 
 		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../fastq/ \
 		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
