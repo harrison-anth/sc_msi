@@ -1,6 +1,6 @@
-#generating pseudo-bulk
-#functions and libs
+##### Create filtered Seurat objects and cell barcode files for pseudobulk analyses ####
 
+# functions and libs
 library(Seurat)
 library(patchwork)
 library(tidyverse)
@@ -8,72 +8,48 @@ library(scAnnotatR)
 library(data.table)
 library(R.utils)
 
+# Receive command line arguments 
 argus <- (commandArgs(asValues=TRUE, excludeReserved=TRUE)[-1])
 sample_name <- as.character(argus[1])
-gsm <- as.character(argus[2])
-gsm_key <- fread('../manifests/final_gsm_key.tsv')
+key <- as.character(argus[2])
+mtx <- as.character(argus[3])
+seed <- as.numeric(argus[4])
+
+#set seed
+set.seed(seed = seed)
 
 
-
-set.seed(seed = 152727)
-
-
-process_data <- function(sample_name,filter_norm,gsm){
+process_data <- function(sample_name,mtx){
   print(paste("Begin processing sample",sample_name,sep=" "))
   print(paste("Read in file",sample_name,sep=" "))
 
 
-if(gsm=="Y"){
-indv_key <- filter(gsm_key, sample_id == sample_name)
+if(mtx=="Y"){
+indv_key <- filter(key, sample_id == sample_name)
 temp <- ReadMtx(
-  mtx=paste0('../gsm_samps/',indv_key$file_prefix,'_matrix.mtx.gz'),
-  cells=paste0('../gsm_samps/',indv_key$file_prefix,'_barcodes.tsv.gz'),
-  features=paste0('../gsm_samps/',indv_key$file_prefix,'_features.tsv.gz')
+  mtx=paste0('../matrices/',indv_key$file_prefix,'_matrix.mtx.gz'),
+  cells=paste0('../marices/',indv_key$file_prefix,'_barcodes.tsv.gz'),
+  features=paste0('../matrices/',indv_key$file_prefix,'_features.tsv.gz')
 )
 
 } else if(gsm=="N"){
-  temp <- Read10X_h5(filename = paste0('../cell_ranger_output/',sample_name,
+temp <- Read10X_h5(filename = paste0('../cell_ranger_output/',sample_name,
 '/outs/filtered_feature_bc_matrix.h5'))
- # print(paste("Converting to Seurat object, filtering, and normalizing"))
- } else{print('SAMPLE NAME ERROR')
+ } else{print('SAMPLE NAME ERROR; CHECK KEY')
 stop()}
-  temp <- CreateSeuratObject(counts=temp,
-                             project="MSI",
-                             min.cells=3,
-                             min.features=100)
-
-
+temp <- CreateSeuratObject(counts=temp,
+                           project="MSI",
+                           min.cells=3,
+                           min.features=100)
 
 
   #add percent mitochondrial
   temp[["percent.mt"]] <- PercentageFeatureSet(temp, pattern = "^MT-")
-  #filter by minimum/maximum number of genes and percent mitochondrial
-  #show pre-filter graphs
-  #VlnPlot(temp, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"), ncol = 3)
-  #show feature scatterplot between any two features
-  #FeatureScatter(temp,feature1="nCount_RNA",feature2="percent.mt")
-  #print(paste('Filtering normal cells'))
-  #copykat <- fread(paste0('copy_kat_results/',sample_name,'_copykat_prediction.txt'))
-  #temp[['tumor']] <- NA
-  #for (i in 1:length(names(temp$tumor))){
-  #  temp2 <- filter(copykat, cell.names == names(temp$tumor[i]))
-  #  temp$tumor[i] <- temp2$copykat.pred
-  #  
-  #}
-  if(filter_norm==TRUE)
-  {
-    temp <- subset(temp,subset=tumor == "aneuploid")
-  }
   temp <- subset(temp,subset = nFeature_RNA > 100 & nFeature_RNA < 3000 & percent.mt < 35)
   temp <- NormalizeData(temp,normalization.method = "LogNormalize",scale.factor = 10000)
   temp <- FindVariableFeatures(temp, selection.method = "vst", nfeatures = 2000)
   
-  #plot most variable genes
-  #top10 <- head(VariableFeatures(temp),10)
-  #LabelPoints(plot=(VariableFeaturePlot(temp),points=top10,repel=TRUE))
-  #scale data
   all.genes <- rownames(temp)
-  #might still need to "regress out" mitchonodrial and other sources of variation
   temp <- ScaleData(temp,feature=all.genes)
   temp <- RunPCA(temp, features=VariableFeatures(object=temp))
   
@@ -86,13 +62,10 @@ stop()}
   #find marker genes that are differentially expressed in clusters
   
   
-  
-  
-  
 saveRDS(temp, paste0('../filtered_h5/',sample_name,'.rds'))
-  
-  return(temp)
-  
+ 
+return(temp)
+ 
   
 }
 
@@ -118,10 +91,6 @@ sep='\t',col.names=FALSE,row.names=FALSE)
 }
 
 
-#determine if sample is gsm or sra
-#if(sample_name %in% gsm_key$sample_id){
-#gsm=TRUE} else{gsm=FALSE}
+s_obj <- process_data(sample_name,mtx)
 
-tryme <- process_data(sample_name,FALSE,gsm)
-
-gen_barcodes(tryme)
+gen_barcodes(s_obj)
