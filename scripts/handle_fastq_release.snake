@@ -37,8 +37,6 @@ rule cellranger:
 		cellranger=config["cellranger"],
 		ref=config["transcriptome"],
 		final_dir="../cell_ranger_output/{sample_name}/"
-	conda:
-		 "base"
 	shell:
 		"""
 # this step helps re-run Cellranger if the job doesn't complete.
@@ -49,7 +47,7 @@ rule cellranger:
 
 		mkdir -p {params.final_dir}
 
-		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../fastq/ \
+		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --create-bam true --fastqs=../fastq/ \
 		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
 		--localcores {threads}
 		"""

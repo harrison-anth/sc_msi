@@ -11,7 +11,7 @@ patient_list: "../manifests/fastq_example_patient_ids.txt"
 patient_key: "../manifests/fastq_example_key.tsv"
 
 #reference transcriptome
-transcriptome: "../references/refdata-gex-GRCh38-2020-A"
+transcriptome: "../references/refdata-gex-GRCh38-2024-A"
 
 #cellranger path
 cellranger: "/home/administrator/cellranger-9.0.1/bin/cellranger"
