@@ -1,0 +1,3 @@
+#### Annotated h5 directory ####
+
+This directory stores the annotated Seurat objects for each sample. These files will eventually be used for integration.

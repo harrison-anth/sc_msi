@@ -100,9 +100,9 @@ rule sensor_rna:
 	shell:
 		"""
 		Rscript sensor_rna_shaper.R {wildcards.sample_name}
-		training_model=../references/{wildcards.sample_name}_training_model.csv
-		msisensor-rna train -i $training_model -m ../references/{wildcards.sample_name}.model -t PanCancer
-		msisensor-rna detection -i ../references/{wildcards.sample_name}.csv -o ../sensor_rna_results/{wildcards.sample_name}.txt \
+		training_model=../temp/{wildcards.sample_name}_training_model.csv
+		msisensor-rna train -i $training_model -m ../temp/{wildcards.sample_name}.model -t PanCancer
+		msisensor-rna detection -i ../temp/{wildcards.sample_name}.csv -o ../sensor_rna_results/{wildcards.sample_name}.txt \
 		-m ../temp/{wildcards.sample_name}.model -d True
 		"""
 
@@ -119,11 +119,15 @@ rule annotate_h5:
 		"../sensor_rna_results/{sample_name}.txt"
 	output:
 		"../annotated_h5/{sample_name}.rds"
+	params:
+		msi_cutoff=config["msi_cutoff"],
+		key=config["patient_key"]
+
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript annotate_bamog.R {wildcards.sample_name}
+		Rscript annotate_bamog.R {wildcards.sample_name} {params.key} {params.msi_cutoff}
 		"""
 
 rule create_sample_plots:
