@@ -1,2 +1,2 @@
-examplefastq
+examplefastq1
 examplefastq2
