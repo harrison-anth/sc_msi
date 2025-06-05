@@ -32,7 +32,7 @@ temp <- ReadMtx(
   features=paste0('../matrices/',indv_key$file_prefix,'_features.tsv.gz')
 )
 
-} else if(gsm=="N"){
+} else if(mtx=="N"){
 temp <- Read10X_h5(filename = paste0('../cell_ranger_output/',sample_name,
 '/outs/filtered_feature_bc_matrix.h5'))
  } else{print('SAMPLE NAME ERROR; CHECK KEY')
