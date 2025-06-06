@@ -81,7 +81,6 @@ RunUMAP(., dims=1:10, reduction= "integrated.cca", reduction.name = "integrated.
 
 
 
-integrated <- calc_msi_prop(integrated)
 
 saveRDS(integrated, paste0('../integrated_samples/',sample_name,'.rds'))
 
