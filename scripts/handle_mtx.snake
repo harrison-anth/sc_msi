@@ -215,8 +215,9 @@ rule summary_stats:
 		"seurat"
 	shell:
 		"""
-		Rscript get_summary_stats.R {wildcards.patient} "N"
+		Rscript get_summary_stats.R {wildcards.patient} {params.key} {params.seed}
 		"""
+
 rule patient_report:
 	input:
 		{rules.integrate_data.output.int_data},
