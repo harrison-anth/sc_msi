@@ -20,7 +20,7 @@ library(tidyverse)
 # Receive command line arguments
 argus <- (commandArgs(asValues=TRUE, excludeReserved=TRUE)[-1])
 sample_name <- as.character(argus[1])
-key <- fread(as.character(argus[2])
+key <- fread(as.character(argus[2]))
 seed <- as.numeric(argus[3])
 
 # Set seed
