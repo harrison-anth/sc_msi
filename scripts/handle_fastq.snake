@@ -219,7 +219,7 @@ rule infercnv_patient:
 	input:
 		{rules.integrate_data.output.int_data}
 	output:
-		"/data3/hanthony/infer_cnv_temp/patient_{patient}/run.final.infercnv_obj"
+		"../infer_cnv_results/patient_{patient}/run.final.infercnv_obj"
 	params:
 		outdir="../infer_cnv_results/patient_{patient}/"
 	conda:

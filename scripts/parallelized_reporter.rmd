@@ -1,5 +1,4 @@
 ---
-author: "Harrison Anthony"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: html_document
 params:
@@ -31,13 +30,9 @@ library(kableExtra)
 library(gtools)
 
 
-#set seed
-set.seed(seed = 152727)
-
 #anova boxplot function
 
 box_plot <- function(patient,tukey_try){
-#create boxplot for data vizz
 
 patient_df <- filter(final_df, patient_id == patient) 
 
