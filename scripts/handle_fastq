@@ -141,7 +141,7 @@ rule create_sample_plots:
 		"seurat"
 	shell:
 		"""
-		Rscript plot_all_bamog.R {wildcards.sample_name}
+		Rscript plot_samples.R {wildcards.sample_name}
 		"""
 
 rule infercnv:
