@@ -181,7 +181,6 @@ rule integrate_data:
 		"""
 		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed} 
 		"""
-
 rule integrated_msi:
 	input:
 		{rules.integrate_data.output.int_data}
@@ -206,8 +205,11 @@ rule cancer_integrated_msi:
 	params:
 		p_name="{patient}_cancer",
 		training_model={rules.integrate_data.output.training_model}
+<<<<<<< HEAD
 	conda:
 		"seurat"
+=======
+>>>>>>> 8d4dd9d278f710f13b2821adbea23375c9787d63
 	shell:
 		"""
 		msisensor-rna train -i {params.training_model} -m ../temp/{params.p_name}.model -t PanCancer
@@ -220,7 +222,11 @@ rule infercnv_patient:
 	input:
 		{rules.integrate_data.output.int_data}
 	output:
+<<<<<<< HEAD
 		"/data3/hanthony/infer_cnv_temp/patient_{patient}/run.final.infercnv_obj"
+=======
+		"../infer_cnv_results/patient_{patient}/infercnv.png"
+>>>>>>> 8d4dd9d278f710f13b2821adbea23375c9787d63
 	params:
 		outdir="../infer_cnv_results/patient_{patient}/"
 	conda:
