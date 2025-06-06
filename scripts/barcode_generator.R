@@ -11,7 +11,7 @@ library(R.utils)
 # Receive command line arguments 
 argus <- (commandArgs(asValues=TRUE, excludeReserved=TRUE)[-1])
 sample_name <- as.character(argus[1])
-key <- as.character(argus[2])
+key <- fread(as.character(argus[2]))
 mtx <- as.character(argus[3])
 seed <- as.numeric(argus[4])
 
