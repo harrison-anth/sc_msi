@@ -128,6 +128,7 @@ rule infercnv:
 		"""
 		Rscript infer_cnv.R {wildcards.sample_name} {params.outdir} {params.seed} {threads}
 		"""
+
 def match_patient_samples(wildcards):
 	indv_key = patient_key[patient_key['patient_id'].str.contains(wildcards.patient)]
 	matched_annotated_samples="../annotated_h5/" +indv_key['filename'].values +".rds"
