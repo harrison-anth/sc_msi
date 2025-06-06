@@ -242,6 +242,7 @@ rule summary_stats:
 		"""
 		Rscript get_summary_stats.R {wildcards.patient} "N"
 		"""
+
 rule patient_report:
 	input:
 		{rules.integrate_data.output.int_data},
@@ -249,7 +250,7 @@ rule patient_report:
 		{rules.integrated_msi.output},
 		{rules.cancer_integrated_msi.output}
 	output:
-		"..reports/{patient}.html",
+		"..reports/{patient}.html"
 	conda:
 		"atomic"
 	shell:

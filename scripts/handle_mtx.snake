@@ -208,6 +208,9 @@ rule summary_stats:
 		{rules.integrate_data.output.int_data}
 	output:
 		"../summary_stats/{patient}_cluster_stats.tsv"
+	params:
+		key=config["patient_key"],
+		seed=0
 	conda:
 		"seurat"
 	shell:
