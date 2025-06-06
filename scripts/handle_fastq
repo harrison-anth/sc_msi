@@ -24,7 +24,8 @@ patient_key=pd.read_table(config["patient_key"])
 
 rule all:
 	input:
-		expand("../reports/{sample_name}_sample_report.pdf",sample_name=samples)
+		expand("../reports/{sample_name}_sample_report.pdf",sample_name=samples),
+		expand("../infer_cnv_results/sample_{sample_name}/final_infercnv.obj",sample_name=samples)
 #		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
 #		expand("../patient_reports/{patient}.html",patient=patients)
 
@@ -141,4 +142,52 @@ rule create_sample_plots:
 		"""
 		Rscript plot_all_bamog.R {wildcards.sample_name}
 		"""
+
+rule infercnv:
+	input:
+		{rules.annotate_h5.output}
+	output:
+		"../infer_cnv_results/sample_{sample_name}/final_infercnv.obj"
+	params:
+		outdir="../infer_cnv_results/sample_{sample_name}",
+		seed=0
+	conda:
+		"seurat"
+	shell:
+		"""
+		Rscript infer_cnv.R {wildcards.sample_name} {params.outdir} {params.seed} {threads}
+		"""
+
+def match_patient_samples(wildcards):
+	indv_key = patient_key[patient_key['patient_id'].str.contains(wildcards.patient)]
+	matched_annotated_samples="../annotated_h5/" +indv_key['filename'].values +".rds"
+	return matched_annotated_samples
+
+rule integrate_data:
+	input:
+		match_patient_samples
+	output:
+		int_data="../integrated_samples/{patient}.rds"
+	params:
+		seed=0,
+		key=config["patient_key"]
+	conda:
+		"atomic"
+	shell:
+		"""
+		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed} 
+		"""
+
+
+
+
+
+
+
+
+
+
+
+
+
 
