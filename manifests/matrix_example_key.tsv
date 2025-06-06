@@ -1,0 +1,3 @@
+patient_id	site	filename	msi_status	msi_test
+TestID	Tumor1	example_mtx1	MSI-H	PCR
+TestID	Tumor2	example_mtx2	MSI-H	PCR
