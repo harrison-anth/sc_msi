@@ -1,84 +1,64 @@
-#### SC-MSI Snakemake pipeline for use with FASTQ/BAM files ####
+#### SC-MSI Snakemake pipeline for use with MTX files ####
 
 # Example command to run #
-# snakemake -s handle_fastq.snake --cores 1 --use-conda 
+# snakemake -s handle_mtx.snake --cores 1 --use-conda
 
 #### BEGIN WORKFLOW ####
 
-#import libraries
-import pandas as pd
-
 #define config file
-configfile: "fastq_config.yaml"
+configfile: "mtx_config.yaml"
 
 with open(config["sample_list"]) as samples_tmp:
 	samples=samples_tmp.read().splitlines()
 
 #read in patient list
 with open(config["patient_list"]) as patient_id:
-	patients=patient_id.read().splitlines()
+        patients=patient_id.read().splitlines()
 
 #read in patient-sample key
+import pandas as pd
 patient_key=pd.read_table(config["patient_key"])
+patient_key['filename'] = patient_key['sample_id']
+
 
 
 rule all:
 	input:
 		expand("../reports/{sample_name}_sample_report.pdf",sample_name=samples),
-		expand("../infer_cnv_results/sample_{sample_name}/final_infercnv.obj",sample_name=samples)
+		expand("../infer_cnv_results/sample_{sample_name}/final_infercnv.obj",sample_name=samples),
+		expand("../integrated_samples/{patient}.rds",patient=patients)
 #		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
 #		expand("../patient_reports/{patient}.html",patient=patients)
 
-rule cellranger:
-	input:
-	output:
-		raw_bam="../cell_ranger_output/{sample_name}/outs/possorted_genome_bam.bam",
-		matrix="../cell_ranger_output/{sample_name}/outs/filtered_feature_bc_matrix.h5"
-	params:
-		cellranger=config["cellranger"],
-		ref=config["transcriptome"],
-		final_dir="../cell_ranger_output/{sample_name}/"
-	shell:
-		"""
-#### this step helps re-run Cellranger if the job doesn't complete.
-		if [[ -d {params.final_dir} ]]
-		then
-		rm -r {params.final_dir}
-		fi
-
-		mkdir -p {params.final_dir}
-
-		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../raw_data/ \
-		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
-		--localcores {threads}
-		"""
-
 rule process_sample:
 	input:
-		{rules.cellranger.output.matrix}
 	output:
 		all_barcodes="../pseudobulk_barcodes/{sample_name}/{sample_name}_all_cell_barcodes.tsv",
 		stripped_barcodes="../pseudobulk_barcodes/{sample_name}/just_barcodes.tsv",
 		filtered_s_obj="../filtered_h5/{sample_name}.rds"
 	params:
-		key=config["patient_key"],
-		mtx='N',
+		sample_key=config["patient_key"],
+		mtx='Y',
 		seed=0
 	conda:
-		"seurat"
+		 "seurat"
 	shell:
 		"""
-		Rscript barcode_generator.R {wildcards.sample_name} {params.key} {params.mtx} {params.seed}
+		if [[ ! -d ../pseudobulk_barcodes/{wildcards.sample_name} ]]
+		then
+		mkdir ../pseudobulk_barcodes/{wildcards.sample_name}
+		fi
+		Rscript barcode_generator.R {wildcards.sample_name} 'Y' {params.sample_key}
 		if [[ ! -f ../pseudobulk_barcodes/{wildcards.sample_name}/just_barcodes.tsv ]]
 		then
 		cut -f 1 ../pseudobulk_barcodes/{wildcards.sample_name}/{wildcards.sample_name}_all_cell_barcodes.tsv > \
-		../pseudobulk_barcodes/{wildcards.sample_name}/just_barcodes.tsv
+		 ../pseudobulk_barcodes/{wildcards.sample_name}/just_barcodes.tsv
 		fi
 		"""
 
 rule scatomic:
 	input:
-		{rules.process_sample.output.filtered_s_obj}
+		"../filtered_h5/{sample_name}.rds"
 	output:
 		cancer_barcodes="../pseudobulk_barcodes/{sample_name}/{sample_name}_cancer_barcodes.tsv",
 		atomic_s_obj="../atomic/{sample_name}.rds"
@@ -88,12 +68,11 @@ rule scatomic:
 		"atomic"
 	shell:
 		"""
-		Rscript atomic.R {wildcards.sample_name} {threads} {params.seed}
+		Rscript atomic.R {wildcards.sample_name}
 		"""
-
 rule sensor_rna:
 	input:
-		{rules.process_sample.output.filtered_s_obj}
+		"../filtered_h5/{sample_name}.rds"
 	output:
 		"../sensor_rna_results/{sample_name}.txt"
 	conda:
@@ -107,13 +86,6 @@ rule sensor_rna:
 		-m ../temp/{wildcards.sample_name}.model -d True
 		"""
 
-def get_list_of_bams(wildcards):
-	ck_output = checkpoints.split_bam.get(sample_name=wildcards.sample_name).output[0]
-	with open(ck_output) as f:
-		bams = [line.strip().replace(".bam","") for line in f]
-	return bams
-
-
 rule annotate_h5:
 	input:
 		{rules.scatomic.output.atomic_s_obj},
@@ -124,7 +96,6 @@ rule annotate_h5:
 	params:
 		msi_cutoff=config["msi_cutoff"],
 		key=config["patient_key"]
-
 	conda:
 		"seurat"
 	shell:
@@ -132,7 +103,7 @@ rule annotate_h5:
 		Rscript annotate_h5.R {wildcards.sample_name} {params.key} {params.msi_cutoff}
 		"""
 
-rule create_sample_plots:
+rule create_plots:
 	input:
 		{rules.annotate_h5.output}
 	output:
@@ -141,9 +112,8 @@ rule create_sample_plots:
 		"seurat"
 	shell:
 		"""
-		Rscript plot_all_bamog.R {wildcards.sample_name}
+		Rscript plot_samples.R {wildcards.sample_name}
 		"""
-
 rule infercnv:
 	input:
 		{rules.annotate_h5.output}
@@ -158,7 +128,6 @@ rule infercnv:
 		"""
 		Rscript infer_cnv.R {wildcards.sample_name} {params.outdir} {params.seed} {threads}
 		"""
-
 def match_patient_samples(wildcards):
 	indv_key = patient_key[patient_key['patient_id'].str.contains(wildcards.patient)]
 	matched_annotated_samples="../annotated_h5/" +indv_key['filename'].values +".rds"
@@ -176,18 +145,5 @@ rule integrate_data:
 		"atomic"
 	shell:
 		"""
-		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed} 
+		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed}
 		"""
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -91,3 +91,22 @@ re-run previously incomplete rules/files triggered by modification time only**
 These are the very basic possible commands with Snakemake. It is recommended to take time to create a custom Snakemake profile to 
 store user settings that enable multi-threading/multi-core processing. There are also many RAM intense applications (Cellranger and InferCNV) 
 that will require tweaking the memory settings for each rule to fit the system settings.
+
+6.) Go through the output files
+
+* In the reports/ directory there will be patient and sample reports based on the information provided in the manifest files 
+
+* There will be plots for each individual and each sample in the infer_cnv_results/ directory (see https://github.com/broadinstitute/infercnv/wiki/Running-InferCNV for information on how to interpret them)
+
+* All individuals will also have summary stats written to a tsv file in the summary_stats/ directory
+
+### Troubleshooting tips for Snakemake
+
+1.) Re-run the pipeline with the --keep-going parameter to see which samples are not running correctly.
+
+2.) Carefully go through each Snakemake log file to determine which step is throwing an ERROR
+
+3.) If you are running with intense settings (multi-threaded/HPC) consider starting with a manifest file containing only 1 individual and 1 sample to check if 
+your specifications are too high or insufficient. 
+
+"Progress through trial and error depends not only on making trials, but on recognizing errors." ~ Virginia Postrel
