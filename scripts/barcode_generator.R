@@ -1,6 +1,6 @@
 ##### Create filtered Seurat objects and cell barcode files for pseudobulk analyses ####
 
-# functions and libs
+# Load libraries
 library(Seurat)
 library(patchwork)
 library(tidyverse)
@@ -15,7 +15,7 @@ key <- as.character(argus[2])
 mtx <- as.character(argus[3])
 seed <- as.numeric(argus[4])
 
-#set seed
+# Set seed
 set.seed(seed = seed)
 
 
@@ -69,11 +69,11 @@ return(temp)
   
 }
 
-#write out processed h5 as a new file for local review
+# write out processed h5 as a new file for local review
 
 gen_barcodes <- function(sample){
 
-#supply an object returned by the process_data() function
+# Supply an object returned by the process_data() function
 
 barcodes <- names(sample$nCount_RNA)
 clusters <- sample$seurat_clusters

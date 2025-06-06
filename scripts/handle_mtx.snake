@@ -5,22 +5,21 @@
 
 #### BEGIN WORKFLOW ####
 
-#define config file
+# Import libraries
+import pandas as pd
+
+# Define config file
 configfile: "mtx_config.yaml"
 
 with open(config["sample_list"]) as samples_tmp:
-	samples=samples_tmp.read().splitlines()
+        samples=samples_tmp.read().splitlines()
 
-#read in patient list
+# Read in patient list
 with open(config["patient_list"]) as patient_id:
         patients=patient_id.read().splitlines()
 
-#read in patient-sample key
-import pandas as pd
+# Read in patient-sample key
 patient_key=pd.read_table(config["patient_key"])
-patient_key['filename'] = patient_key['sample_id']
-
-
 
 rule all:
 	input:
