@@ -42,12 +42,12 @@ sparse_matrix <- rds1@assays$RNA$counts
 
 # Get cell type predictions
 cell_predictions <- run_scATOMIC(sparse_matrix,mc.cores = cores)
-results_temp <- create_summary_matrix(prediction_list = cell_predictions, use_CNVs = F, modify_results = T, mc.cores = cores, raw_counts = sparse_matrix, min_prop = 0.5 )
-
-
-# Convert normal versus tumor names
-if( ! ('pan_cancer_cluster' %in% colnames(results_temp))){results_temp$pan_cancer_cluster <- 'Normal'}
-
+results_temp <- create_summary_matrix(prediction_list = cell_predictions, 
+use_CNVs = F, 
+modify_results = T, 
+mc.cores = cores, 
+raw_counts = sparse_matrix, 
+min_prop = 0.5 )
 
 # Attach results
 rds2<- AddMetaData(rds1, results_temp)
