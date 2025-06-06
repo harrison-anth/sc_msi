@@ -191,12 +191,13 @@ rule infercnv_patient:
 	output:
 		"../infer_cnv_results/patient_{patient}/run.final.infercnv_obj"
 	params:
-		outdir="../infer_cnv_results/patient_{patient}/"
+		outdir="../infer_cnv_results/patient_{patient}/",
+		seed=0
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript infer_patient_cnv.R {wildcards.patient} {params.outdir}
+		Rscript infer_patient_cnv.R {wildcards.patient} {params.outdir} {params.seed} {threads}
 		mkdir -p ../images/{wildcards.patient}_cnv/
 		cp {params.outdir}*.png ../images/{wildcards.patient}_cnv/
 		"""
