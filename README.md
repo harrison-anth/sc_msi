@@ -26,6 +26,9 @@ This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.
 
 * Containerize workflow to optionally not install each software
 
+* Include additional/supplementary plots that were shown in the manuscript
+
+**Feel free to message me or open an issue with any other suggestions you might have**
 
 ### Installation instructions
 
