@@ -171,7 +171,6 @@ rule integrate_data:
 	output:
 		int_data="../integrated_samples/{patient}.rds",
 		canc_data="../integrated_samples/{patient}_cancer.rds",
-		training_model="../temp/{patient}_training_model.csv"
 	params:
 		seed=0,
 		key=config["patient_key"]
@@ -181,13 +180,14 @@ rule integrate_data:
 		"""
 		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed} 
 		"""
+
 rule integrated_msi:
 	input:
 		{rules.integrate_data.output.int_data}
 	output:
 		"../sensor_rna_results/int_{patient}.txt"
 	params:
-		training_model={rules.integrate_data.output.training_model}
+		training_model="../temp/{patient}_training_model.csv"
 	conda:
 		"seurat"
 	shell:
@@ -204,7 +204,7 @@ rule cancer_integrated_msi:
 		"../sensor_rna_results/int_{patient}_cancer.txt"
 	params:
 		p_name="{patient}_cancer",
-		training_model={rules.integrate_data.output.training_model}
+		training_model="../temp/{patient}_training_model.csv"
 	conda:
 		"seurat"
 	shell:
@@ -221,15 +221,15 @@ rule infercnv_patient:
 	output:
 		"../infer_cnv_results/patient_{patient}/run.final.infercnv_obj"
 	params:
-		outdir="../infer_cnv_results/patient_{patient}/"
+		outdir="../infer_cnv_results/patient_{patient}/",
+		seed=0
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript infer_patient_cnv.R {wildcards.patient} {params.outdir}
-		mkdir -p ../images/{wildcards.patient}_cnv/
-		cp {params.outdir}*.png ../images/{wildcards.patient}_cnv/
+		Rscript infer_patient_cnv.R {wildcards.patient} {params.outdir} {params.seed} {threads}
 		"""
+
 rule summary_stats:
 	input:
 		{rules.infercnv_patient.output},
@@ -254,11 +254,14 @@ rule patient_report:
 		{rules.cancer_integrated_msi.output}
 	output:
 		"..reports/{patient}.html"
+	params:
+		key=config["patient_key"],
+		seed=0
 	conda:
 		"atomic"
 	shell:
 		"""	
-		Rscript patient_report_generator.R {wildcards.patient}
+		Rscript patient_report_generator.R {wildcards.patient} {params.key} {params.seed}
 		"""
 
 

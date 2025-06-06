@@ -42,22 +42,17 @@ if(num_tot_samps <2 | num_tumor_samps < 2){
 print('Fewer than 2 tumor samples, no need to integrate.')
 
 indv_key <- filter(indv_key, site != "normal" & site != "Normal")
-file__name <- indv_key$filename[1]
 
-integrated <- readRDS(paste0('../annotated_h5/',file_name,'.rds'))
+integrated <- readRDS(paste0('../annotated_h5/',sample_name,'.rds'))
 
-saveRDS(integrated, paste0('../integrated_samples/',sample_name,'.rds'))
+saveRDS(integrated, paste0('../integrated_samples/',indv_key$filename[1],'.rds'))
 
 } else{
 all_objs <- list()
 
 for(i in 1:nrow(indv_key)) {
 
-file_name <- indv_key$filename[i]
-
-
-
-assign(x = paste0('s_obj'),value = readRDS(paste0('../annotated_h5/',file_name,'.rds')))
+assign(x = paste0('s_obj'),value = readRDS(paste0('../annotated_h5/',indv_key$filename[i],'.rds')))
 s_obj$sensor_rna_prob <- as.numeric(s_obj$sensor_rna_prob)
 
 assign(x = paste0(sample_name,'_', i),value = s_obj) %>% append(all_objs) -> all_objs

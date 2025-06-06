@@ -2,9 +2,7 @@
 
 Note: downsampled fastq and matrix test files are included to verify the correct installation of the pipeline and provide an example. 
 
-The example fastq is from SRR17547565 and the example matrix file is from GSE205506. The fastq file was downsampled using seqtk (https://github.com/lh3/seqtk).
-
-
+# Additional information: 
 
 ## Patient ID file
 TXT file with one patient ID per line.
