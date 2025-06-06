@@ -11,8 +11,9 @@ set.seed(seed = 152727)
 argus <- (commandArgs(asValues=TRUE, excludeReserved=TRUE)[-1])
 sample_name <- as.character(argus[1])
 outdir <- as.character(argus[2])
+num_threads <- as.numeric(argus[3])
 
-s_obj <- readRDS(paste0('../annotated_h5/',sample_name,'.rds'))
+s_obj <- readRDS(paste0('../integrated_samples/',sample_name,'.rds'))
 #create annotations file
 anno <- data.frame(cell_name=colnames(s_obj),cancer=s_obj$pan_cancer_cluster,
 type=s_obj$scATOMIC_pred,msi=s_obj$sensor_rna_status)
@@ -29,15 +30,16 @@ fwrite(final_anno,file=paste0('../temp/',sample_name,'_anno.tsv'),sep='\t',col.n
 #anno$msi[is.na(anno$msi)] <- "MSS"
 ##double checking the NA conversion doesn't impact clonality too much
 
+
 anno$cancer2 <- paste0(anno$cancer,'_',anno$msi)
-
 final_anno <- data.frame(cell_name=anno$cell_name,type=ifelse(anno$cancer =="Normal",yes=anno$cancer,no=anno$cancer2))
-
 #filter NA's here (see above comment)
 final_anno <- filter(final_anno, type != "Cancer_NA")
 
 fwrite(final_anno,file=paste0('../temp/',sample_name,'_anno.tsv'),sep='\t',col.names=FALSE)
 }
+
+
 
 #create infercnv object
 cnv_obj <- CreateInfercnvObject(raw_counts_matrix=s_obj@assays$RNA$counts,
@@ -55,6 +57,7 @@ infercnv_obj = infercnv::run(cnv_obj,
                              cluster_by_groups=T,   # cluster
                              denoise=T,
                              HMM=T,
-                             num_threads=1
+                             num_threads=num_threads,
+                             leiden_resolution='auto',
+                             k_nn=50
                              )
-

@@ -16,15 +16,16 @@ repository (https://github.com/harrison-anth/sc_msi_legacy).
 
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.2, and Cell Ranger 7.2.0.
 
-### Planned pipeline improvements
+### Planned pipeline features to be added
 
-* Create separate files for each rule to help users incorporate multi-threading
+* Create separate files for each rule to help users incorporate multi-threading and custom filter/cluster settings
 
 * Combine FASTQ/MTX file workflows with automatic file detection
 
 * Include small reference transcriptome to verify installation of FASTQ Snake file
 
 * Containerize workflow to optionally not install each software
+
 
 ### Installation instructions
 
