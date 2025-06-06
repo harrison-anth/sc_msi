@@ -201,44 +201,43 @@ rule integrate_data:
 		"""
 		Rscript integrate_all4.R {wildcards.patient} 'N'
 		"""
-rule int_msi:
+rule integrated_msi:
 	input:
 		{rules.integrate_data.output.int_data}
 	output:
 		"../sensor_rna_results/int_{patient}.txt"
+	params:
+		training_model={rules.integrate_data.output.training_model}
 	shell:
 		"""
-		training_model=../temp/{wildcards.patient}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{wildcards.patient}.model -t PanCancer
+		msisensor-rna train -i {params.training_model} -m ../temp/{wildcards.patient}.model -t PanCancer
 		msisensor-rna detection -i ../temp/{wildcards.patient}.csv \
 		-o ../sensor_rna_results/int_{wildcards.patient}.txt -m ../temp/{wildcards.patient}.model -d True
 		"""
 
 rule canc_int_msi:
 	input:
-		"../integrated_samples/{patient}_cancer.rds"
+		{rules.integrate_data.output.canc_data}
 	output:
 		"../sensor_rna_results/int_{patient}_cancer.txt"
 	params:
-		p_name="{patient}_cancer"
+		p_name="{patient}_cancer",
+		training_model={rules.integrate_data.output.training_model}
 	shell:
 		"""
-		training_model=../temp/{params.p_name}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{params.p_name}.model -t PanCancer
+		msisensor-rna train -i {params.training_model} -m ../temp/{params.p_name}.model -t PanCancer
 		msisensor-rna detection -i ../temp/{params.p_name}.csv \
 		-o ../sensor_rna_results/int_{params.p_name}.txt -m ../temp/{params.p_name}.model -d True
 		"""
 
+#### Note this step can require a lot of RAM ####
 rule infercnv_patient:
 	input:
-		"../integrated_samples/{patient}.rds"
+		{rules.integrate_data.output.int_data}
 	output:
-		"/data3/hanthony/infer_cnv_temp/patient_{patient}/infercnv.png"
+		"../infer_cnv_results/patient_{patient}/infercnv.png"
 	params:
-		outdir="/data3/hanthony/infer_cnv_temp/patient_{patient}/"
-	threads: 16
-	resources:
-		mem="0G"
+		outdir="../infer_cnv_results/patient_{patient}/"
 	conda:
 		"seurat"
 	shell:
@@ -254,8 +253,6 @@ rule summary_stats:
 		{rules.integrate_data.output.int_data}
 	output:
 		"../summary_stats/{patient}_cluster_stats.tsv"
-	resources:
-		mem="0G"
 	conda:
 		"seurat"
 	shell:
