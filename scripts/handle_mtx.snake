@@ -47,7 +47,7 @@ rule process_sample:
 		then
 		mkdir ../pseudobulk_barcodes/{wildcards.sample_name}
 		fi
-		Rscript barcode_generator.R {wildcards.sample_name} 'Y' {params.sample_key}
+		Rscript barcode_generator.R {wildcards.sample_name} {params.sample_key} {params.mtx} {params.seed}
 		if [[ ! -f ../pseudobulk_barcodes/{wildcards.sample_name}/just_barcodes.tsv ]]
 		then
 		cut -f 1 ../pseudobulk_barcodes/{wildcards.sample_name}/{wildcards.sample_name}_all_cell_barcodes.tsv > \
