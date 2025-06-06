@@ -25,11 +25,11 @@ process_data <- function(sample_name,mtx){
 
 
 if(mtx=="Y"){
-indv_key <- filter(key, sample_id == sample_name)
+indv_key <- filter(key, sample_name == filename)
 temp <- ReadMtx(
-  mtx=paste0('../matrices/',indv_key$file_prefix,'_matrix.mtx.gz'),
-  cells=paste0('../marices/',indv_key$file_prefix,'_barcodes.tsv.gz'),
-  features=paste0('../matrices/',indv_key$file_prefix,'_features.tsv.gz')
+  mtx=paste0('../raw_data/',sample_name,'.matrix.mtx.gz'),
+  cells=paste0('../raw_data/',sample_name,'.barcodes.tsv.gz'),
+  features=paste0('../raw_data/',sample_name,'.features.tsv.gz')
 )
 
 } else if(mtx=="N"){
