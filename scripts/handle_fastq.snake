@@ -28,7 +28,7 @@ rule all:
 		expand("../infer_cnv_results/sample_{sample_name}/run.final.infercnv_obj",sample_name=samples),
 		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
 		expand("../infer_cnv_results/patient_{patient}/run.final.infercnv_obj",patient=patients),
-		expand("..reports/{patient}.html",patient=patients)
+		expand("../reports/{patient}.html",patient=patients)
 
 rule cellranger:
 	input:
