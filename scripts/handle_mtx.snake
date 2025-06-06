@@ -198,8 +198,6 @@ rule infercnv_patient:
 	shell:
 		"""
 		Rscript infer_patient_cnv.R {wildcards.patient} {params.outdir} {params.seed} {threads}
-		mkdir -p ../images/{wildcards.patient}_cnv/
-		cp {params.outdir}*.png ../images/{wildcards.patient}_cnv/
 		"""
 
 rule summary_stats:
