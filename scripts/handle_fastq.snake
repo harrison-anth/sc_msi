@@ -24,8 +24,11 @@ patient_key=pd.read_table(config["patient_key"])
 
 rule all:
 	input:
+		expand("../reports/{sample_name}_sample_report.pdf",sample_name=samples),
+		expand("../infer_cnv_results/sample_{sample_name}/run.final.infercnv_obj",sample_name=samples),
 		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
-		expand("../patient_reports/{patient}.html",patient=patients)
+		expand("../infer_cnv_results/patient_{patient}/run.final.infercnv_obj",patient=patients),
+		expand("..reports/{patient}.html",patient=patients)
 
 rule cellranger:
 	input:
@@ -36,22 +39,17 @@ rule cellranger:
 		cellranger=config["cellranger"],
 		ref=config["transcriptome"],
 		final_dir="../cell_ranger_output/{sample_name}/"
-	conda:
-		 "base"
 	shell:
 		"""
-		if [[ -d {params.temp_dir} ]]
-		then
-		rm -r {params.temp_dir}
-		fi
+#### this step helps re-run Cellranger if the job doesn't complete.
 		if [[ -d {params.final_dir} ]]
 		then
 		rm -r {params.final_dir}
 		fi
 
-		mkdir -p {params.temp_dir}
+		mkdir -p {params.final_dir}
 
-		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../fastq/ \
+		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../raw_data/ \
 		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
 		--localcores {threads}
 		"""
@@ -61,14 +59,17 @@ rule process_sample:
 		{rules.cellranger.output.matrix}
 	output:
 		all_barcodes="../pseudobulk_barcodes/{sample_name}/{sample_name}_all_cell_barcodes.tsv",
-		just_barcodes="../pseudobulk_barcodes/{sample_name}/just_barcodes.tsv",
-		filtered_h5="../filtered_h5/{sample_name}.rds"
+		stripped_barcodes="../pseudobulk_barcodes/{sample_name}/just_barcodes.tsv",
+		filtered_s_obj="../filtered_h5/{sample_name}.rds"
+	params:
+		key=config["patient_key"],
+		mtx='N',
+		seed=0
 	conda:
-		"../conda_envs/seurat.yml"
+		"seurat"
 	shell:
 		"""
-#		mkdir -p ../pseudobulk_barcodes/{wildcards.sample_name}
-		Rscript barcode_generator.R {wildcards.sample_name} 'N'
+		Rscript barcode_generator.R {wildcards.sample_name} {params.key} {params.mtx} {params.seed}
 		if [[ ! -f ../pseudobulk_barcodes/{wildcards.sample_name}/just_barcodes.tsv ]]
 		then
 		cut -f 1 ../pseudobulk_barcodes/{wildcards.sample_name}/{wildcards.sample_name}_all_cell_barcodes.tsv > \
@@ -76,22 +77,24 @@ rule process_sample:
 		fi
 		"""
 
-rule find_cancer:
+rule scatomic:
 	input:
-		"../filtered_h5/{sample_name}.rds"
+		{rules.process_sample.output.filtered_s_obj}
 	output:
-		"../pseudobulk_barcodes/{sample_name}/{sample_name}_cancer_barcodes.tsv",
-		"../atomic/{sample_name}.rds"
+		cancer_barcodes="../pseudobulk_barcodes/{sample_name}/{sample_name}_cancer_barcodes.tsv",
+		atomic_s_obj="../atomic/{sample_name}.rds"
+	params:
+		seed=0
 	conda:
-		"../conda_envs/atomic.yml"
+		"atomic"
 	shell:
 		"""
-		Rscript atomic.R {wildcards.sample_name}
+		Rscript atomic.R {wildcards.sample_name} {threads} {params.seed}
 		"""
 
 rule sensor_rna:
 	input:
-		"../filtered_h5/{sample_name}.rds"
+		{rules.process_sample.output.filtered_s_obj}
 	output:
 		"../sensor_rna_results/{sample_name}.txt"
 	conda:
@@ -112,74 +115,50 @@ def get_list_of_bams(wildcards):
 	return bams
 
 
-checkpoint split_bam:
+rule annotate_h5:
 	input:
-		tumor={rules.cellranger.output.raw_bam},
-		barcodes="../pseudobulk_barcodes/{sample_name}/{sample_name}_all_cell_barcodes.tsv"
-	output:
-		"../temp/{sample_name}_temp_bams.txt"
-	resources:
-		mem="0G"
-	threads: 16
-	conda:
-		"rusty"
-	shell:
-		"""
-		if [[ ! -d "../bam/{wildcards.sample_name}" ]]
-		then
-		mkdir ../bam/{wildcards.sample_name}
-		fi
-		sinto filterbarcodes -b {input.tumor} -c {input.barcodes} \
-		--barcodetag "CB" -p {threads} --outdir ../bam/{wildcards.sample_name}/
-
-		find ../bam/{wildcards.sample_name}/*.bam -printf "%f\n" > ../temp/{wildcards.sample_name}_temp_bams.txt
-		"""
-
-checkpoint annotate_h5:
-	input:
-		"../atomic/{sample_name}.rds",
-		"../sensor_rna_results/{sample_name}.txt"
+		{rules.scatomic.output.atomic_s_obj},
+		{rules.sensor_rna.output},
+		{rules.process_sample.output.filtered_s_obj}
 	output:
 		"../annotated_h5/{sample_name}.rds"
+	params:
+		msi_cutoff=config["msi_cutoff"],
+		key=config["patient_key"]
+
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript annotate_bamog.R {wildcards.sample_name}
+		Rscript annotate_h5.R {wildcards.sample_name} {params.key} {params.msi_cutoff}
 		"""
 
-rule create_plots:
+rule create_sample_plots:
 	input:
-		"../annotated_h5/{sample_name}.rds"
+		{rules.annotate_h5.output}
 	output:
-		"../images/{sample_name}_cell_types.pdf",
-		"../images/{sample_name}_msi_plots.pdf"
+		"../reports/{sample_name}_sample_report.pdf"
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript plot_all_bamog.R {wildcards.sample_name}
+		Rscript plot_samples.R {wildcards.sample_name}
 		"""
 
 rule infercnv:
 	input:
-		"../annotated_h5/{sample_name}.rds"
+		{rules.annotate_h5.output}
 	output:
-		"/data3/hanthony/infer_cnv_temp/sample_{sample_name}/infercnv.png"
+		"../infer_cnv_results/sample_{sample_name}/run.final.infercnv_obj"
 	params:
-		outdir="/data3/hanthony/infer_cnv_temp/sample_{sample_name}/"
-	threads: 5
-	resources:
-		mem="30G"
+		outdir="../infer_cnv_results/sample_{sample_name}",
+		seed=0
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript infer_cnv.R {wildcards.sample_name} {params.outdir}
-		mkdir -p ../images/{wildcards.sample_name}_cnv/
-		cp {params.outdir}*.png ../images/{wildcards.sample_name}_cnv/
+		Rscript infer_cnv.R {wildcards.sample_name} {params.outdir} {params.seed} {threads}
 		"""
-
 
 def match_patient_samples(wildcards):
 	indv_key = patient_key[patient_key['patient_id'].str.contains(wildcards.patient)]
@@ -191,54 +170,59 @@ rule integrate_data:
 		match_patient_samples
 	output:
 		int_data="../integrated_samples/{patient}.rds",
-		canc_data="../integrated_samples/{patient}_cancer.rds"
-	threads: 20
-	resources:
-		mem="0G"
+		canc_data="../integrated_samples/{patient}_cancer.rds",
+		training_model="../temp/{patient}_training_model.csv"
+	params:
+		seed=0,
+		key=config["patient_key"]
 	conda:
 		"atomic"
 	shell:
 		"""
-		Rscript integrate_all4.R {wildcards.patient} 'N'
+		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed} 
 		"""
-rule int_msi:
+
+rule integrated_msi:
 	input:
 		{rules.integrate_data.output.int_data}
 	output:
 		"../sensor_rna_results/int_{patient}.txt"
+	params:
+		training_model={rules.integrate_data.output.training_model}
+	conda:
+		"seurat"
 	shell:
 		"""
-		training_model=../temp/{wildcards.patient}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{wildcards.patient}.model -t PanCancer
+		msisensor-rna train -i {params.training_model} -m ../temp/{wildcards.patient}.model -t PanCancer
 		msisensor-rna detection -i ../temp/{wildcards.patient}.csv \
 		-o ../sensor_rna_results/int_{wildcards.patient}.txt -m ../temp/{wildcards.patient}.model -d True
 		"""
 
-rule canc_int_msi:
+rule cancer_integrated_msi:
 	input:
-		"../integrated_samples/{patient}_cancer.rds"
+		{rules.integrate_data.output.canc_data}
 	output:
 		"../sensor_rna_results/int_{patient}_cancer.txt"
 	params:
-		p_name="{patient}_cancer"
+		p_name="{patient}_cancer",
+		training_model={rules.integrate_data.output.training_model}
+	conda:
+		"seurat"
 	shell:
 		"""
-		training_model=../temp/{params.p_name}_training_model.csv
-		msisensor-rna train -i $training_model -m ../temp/{params.p_name}.model -t PanCancer
+		msisensor-rna train -i {params.training_model} -m ../temp/{params.p_name}.model -t PanCancer
 		msisensor-rna detection -i ../temp/{params.p_name}.csv \
 		-o ../sensor_rna_results/int_{params.p_name}.txt -m ../temp/{params.p_name}.model -d True
 		"""
 
+#### Note this step can require a lot of RAM ####
 rule infercnv_patient:
 	input:
-		"../integrated_samples/{patient}.rds"
+		{rules.integrate_data.output.int_data}
 	output:
-		"/data3/hanthony/infer_cnv_temp/patient_{patient}/infercnv.png"
+		"/data3/hanthony/infer_cnv_temp/patient_{patient}/run.final.infercnv_obj"
 	params:
-		outdir="/data3/hanthony/infer_cnv_temp/patient_{patient}/"
-	threads: 16
-	resources:
-		mem="0G"
+		outdir="../infer_cnv_results/patient_{patient}/"
 	conda:
 		"seurat"
 	shell:
@@ -247,33 +231,31 @@ rule infercnv_patient:
 		mkdir -p ../images/{wildcards.patient}_cnv/
 		cp {params.outdir}*.png ../images/{wildcards.patient}_cnv/
 		"""
-
 rule summary_stats:
 	input:
 		{rules.infercnv_patient.output},
 		{rules.integrate_data.output.int_data}
 	output:
 		"../summary_stats/{patient}_cluster_stats.tsv"
-	resources:
-		mem="0G"
 	conda:
 		"seurat"
 	shell:
 		"""
-		Rscript get_summary_stats2.R {wildcards.patient} "N"
+		Rscript get_summary_stats.R {wildcards.patient} "N"
 		"""
 rule patient_report:
 	input:
-		"../integrated_samples/{patient}.rds",
-		"../integrated_samples/{patient}_cancer.rds",
-		{rules.int_msi.output},
-		{rules.canc_int_msi.output}
+		{rules.integrate_data.output.int_data},
+		{rules.integrate_data.output.canc_data},
+		{rules.integrated_msi.output},
+		{rules.cancer_integrated_msi.output}
 	output:
-		"../patient_reports/{patient}.html"
+		"..reports/{patient}.html",
 	conda:
 		"atomic"
 	shell:
-		"""
+		"""	
 		Rscript patient_report_generator.R {wildcards.patient}
 		"""
+
 

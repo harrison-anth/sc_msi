@@ -24,10 +24,11 @@ patient_key=pd.read_table(config["patient_key"])
 rule all:
 	input:
 		expand("../reports/{sample_name}_sample_report.pdf",sample_name=samples),
-		expand("../infer_cnv_results/sample_{sample_name}/final_infercnv.obj",sample_name=samples),
-		expand("../integrated_samples/{patient}.rds",patient=patients)
-#		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
-#		expand("../patient_reports/{patient}.html",patient=patients)
+		expand("../infer_cnv_results/sample_{sample_name}/run.final.infercnv_obj",sample_name=samples),
+		expand("../infer_cnv_results/patient_{patient}/run.final.infercnv_obj",patient=patients),
+		expand("../integrated_samples/{patient}.rds",patient=patients),
+		expand("../summary_stats/{patient}_cluster_stats.tsv",patient=patients),
+		expand("../patient_reports/{patient}.html",patient=patients)
 
 rule process_sample:
 	input:
