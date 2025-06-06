@@ -22,29 +22,29 @@ This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.
 
 * Combine FASTQ/MTX file workflows with automatic file detection
 
-* Include small reference transcriptome to verify installation
+* Include small reference transcriptome to verify installation of FASTQ Snake file
 
 * Containerize workflow to optionally not install each software
 
 ### Installation instructions
 
-Download and install the following dependencies: 
+1.) Download and install the following dependencies: 
 
-1.) Conda/Mamba (https://docs.conda.io/en/latest/)
+* Conda/Mamba (https://docs.conda.io/en/latest/)
 
-2.) Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
+* Snakemake (https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 
-3.) Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
+* Cellranger (https://www.10xgenomics.com/support/software/cell-ranger/downloads)
 
-4.) Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
+* Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
 
-5.) Create the conda environments stored in the conda_envs/ directory:
+2.) Create the conda environments stored in the conda_envs/ directory:
 
 ```conda env create -f atomic.yml```
 
 ```conda env create -f seurat.yml```
 
-6.) Activate the atomic Conda environment and install scATOMIC
+3.) Activate the atomic Conda environment and install scATOMIC
 
 https://github.com/abelson-lab/scATOMIC
 
@@ -60,21 +60,33 @@ and could very well affect the functionality of the pipeline.
 
 1.) Verify installation by running the test sample. 
 
-``` snakemake -s handle_fastq.snake ```
+``` snakemake -s handle_fastq.snake --cores 1 --use-conda ```
 
-2.) Edit the settings in the config file to replace the default test settings
+``` snakemake -s handle_mtx.snake --cores 1 --use-conda ```
+
+2.) Move your FASTQ or MTX files into the raw_data/ directory
+
+3.) Create manifest files that link individual ID's to sample ID's (see manifests/ directory for details)
+
+4.) Edit the settings in the config file to replace the default test settings
 
 FASTQ files -- handle_fastq.config
 
 MTX files -- handle_mtx.config
 
-Note: There is a separate README in the manifests/ directory that describes each config file and how to create them. 
+5.) Re-run the pipeline with updated config files and additional settings (some examples below but reference the above link to Snakemake for more information)
 
-3.) Run the pipeline
+**Run FASTQ Snake file with 1 core (single-threaded);
+use Conda environments; 
+don't stop if error encountered; 
+increase time to detect output file; 
+re-run previously incomplete rules/files triggered by modification time only**
 
-FASTQ files -- ``` snakemake -s handle_fastq.snake --cores 1 --use-conda ```
+``` snakemake -s handle_fastq.snake --cores 1 --use-conda --keep-going --latency-wait 120 --rerun-incomplete --rerun-triggers mtime```
 
-MTX files -- ``` snakemake -s handle_mtx.snake ```
+** Run FASTQ Snake file with SLURM executor profile using 30 cores (parallel processing); use Conda environments**
+
+ ``` snakemake -s handle_mtx.snake -p ../conda_envs/slurm_executor/ --cores 30 --use-conda --```
 
 These are the very basic possible commands with Snakemake. It is recommended to take time to create a custom Snakemake profile to 
 store user settings that enable multi-threading/multi-core processing. There are also many RAM intense applications (Cellranger and InferCNV) 

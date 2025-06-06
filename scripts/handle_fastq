@@ -48,7 +48,7 @@ rule cellranger:
 
 		mkdir -p {params.final_dir}
 
-		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../fastq/ \
+		{params.cellranger} count --id={wildcards.sample_name} --transcriptome={params.ref} --fastqs=../raw_data/ \
 		--sample={wildcards.sample_name} --output-dir {params.final_dir} \
 		--localcores {threads}
 		"""
@@ -177,7 +177,6 @@ rule integrate_data:
 		"""
 		Rscript integrate_samples.R {wildcards.patient} {params.key} {params.seed} 
 		"""
-
 
 
 
