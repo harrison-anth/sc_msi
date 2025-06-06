@@ -17,7 +17,7 @@ seed <- as.numeric(argus[3])
 cores <- as.numeric(argus[4])
 
 # Set seed
-set.seed(seed = 152727)
+set.seed(seed = seed)
 
 s_obj <- readRDS(paste0('../annotated_h5/',sample_name,'.rds'))
 
@@ -26,8 +26,8 @@ anno <- data.frame(cell_name=colnames(s_obj),cancer=s_obj$pan_cancer_cluster,
 type=s_obj$scATOMIC_pred,msi=s_obj$sensor_rna_status)
 
 
-#verify there are cancer cells in this sample
-if(nrow(filter(anno, cancer == "Cancer"))){
+# Verify there are cancer cells in this sample
+if(nrow(filter(anno, cancer == "Cancer")) < 1){
 
 print(paste0('ERROR: No cancer cells identified in ', sample_name, '. Re-assess scATOMIC settings or remove sample from manifest files.'))
 stop()
