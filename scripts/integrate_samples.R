@@ -96,7 +96,7 @@ ct_mat <- as.data.frame(ct_mat) %>% rownames_to_column('SampleID')
 
 # Create custom training data columns for pseudobulks
 
-pre_model <- fread ('../reference_files/sensor_rna.csv')
+pre_model <- fread ('../references/sensor_rna.csv')
 
 common_names <- intersect(colnames(ct_mat),colnames(pre_model))
 

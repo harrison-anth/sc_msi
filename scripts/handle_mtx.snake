@@ -67,7 +67,7 @@ rule scatomic:
 		"atomic"
 	shell:
 		"""
-		Rscript atomic.R {wildcards.sample_name}
+		Rscript atomic.R {wildcards.sample_name} {threads} {params.seed}
 		"""
 rule sensor_rna:
 	input:
