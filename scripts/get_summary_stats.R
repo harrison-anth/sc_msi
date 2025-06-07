@@ -36,7 +36,6 @@ cancer_fin <- AddMetaData(int_cancer_obj,metadata=int_s_obj$infercnv_subcluster,
 indv_key <- filter(key, patient_id == sample_name)
 num_tumor_samps <- nrow(filter(indv_key, site != "normal" & site != "Normal"))
 num_tot_samps <- nrow(indv_key)
-if(gsm == 'N'){treatment <- 'untreated'}else{treatment <- indv_key$treatment[1]}
 
 if(length(levels(droplevels(cancer_fin$seurat_clusters)))<2){
 print('Only one cluster of cancer cells; cannot run anova')
