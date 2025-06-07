@@ -11,7 +11,8 @@ MIT; see LICENSE file for more information.
 
 ### Repository information
 
-This repository functions as a distribution of the SC-MSI Snakemake pipeline used in our recept manuscript. The results and raw code used in the manuscript can be found in the legacy version of this
+This repository functions as a distribution of the SC-MSI Snakemake pipeline used in our recept manuscript. 
+The results and raw code submitted as part of the publication can be found in the legacy version of this
 repository (https://github.com/harrison-anth/sc_msi_legacy).
 
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.2, and Cell Ranger 7.2.0.
