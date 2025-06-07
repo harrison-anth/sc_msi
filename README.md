@@ -42,11 +42,12 @@ This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.
 **Note: Cell Ranger and reference transcriptome are only necessary for 
 the FASTQ pipeline**
  
-	* Cellranger ```wget -O cellranger-7.2.0.tar.gz 
+* Cellranger ```wget -O cellranger-7.2.0.tar.gz 
 "https://cf.10xgenomics.com/releases/cell-exp/cellranger-7.2.0.tar.gz?Expires=1749374999&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA&Signature=Oi4tu~mQ8B0T3hOUjGgm7Xy8f-Z92tdauD~0D~9M3GbwQKJW7txWVFWr6aQpmfI7mrYTM8965onbhcKNWBI2S9Uu8OYl7c8kWMLCzP1rs8rAeitL~eB~2kqc29NZrT5pnDjIkPTzh1huBj53qXmo7oDopIxdl2~llGwZ3oVd8dJSQfZtPe08NwPnOQgLa0IhD8TplsSf7uHGvyfR9lSBvvICSlkqzkuvKfE56Qg-fV5lRad7jLOjFTZNhPxZ4Mh4FpPuGxr-s2KWBa~OS0~4w3nP3PLUUVl5EjjHfW0XPusv0m-vT1jGskKWjN9Mzx0ttv8ddjNfiU04imz7o8BBfQ__"```
 
-	* Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
-	* Change the reference transcriptome path in the config file
+* Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
+
+* Change the reference transcriptome path in the config file
 
 2.) Create the conda environments stored in the conda_envs/ directory:
 
