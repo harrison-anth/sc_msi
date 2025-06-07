@@ -95,7 +95,8 @@ re-run previously incomplete rules/files triggered by modification time only**
 
 ``` snakemake -s handle_fastq.snake --cores 1 --use-conda --keep-going --latency-wait 120 --rerun-incomplete --rerun-triggers mtime```
 
-**Run FASTQ Snake file with SLURM executor profile using 30 cores (parallel processing); use Conda environments**
+**Run MTX Snake file with SLURM executor profile using 30 cores 
+(parallel processing); use Conda environments**
 
  ``` snakemake -s handle_mtx.snake -p ../conda_envs/slurm_executor/ --cores 30 --use-conda --```
 
