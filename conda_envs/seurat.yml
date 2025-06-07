@@ -1,8 +1,8 @@
 name: seurat
 channels:
   - r
-  - conda-forge
   - bioconda
+  - conda-forge
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
@@ -46,15 +46,17 @@ dependencies:
   - bioconductor-treeio=1.26.0=r43hdfd78af_1
   - bioconductor-xvector=0.42.0=r43ha9d7317_2
   - bioconductor-zlibbioc=1.48.0=r43ha9d7317_2
+  - blas=1.0=openblas
   - boltons=24.1.0=py312h06a4308_0
+  - bottleneck=1.4.2=py312ha883a20_0
   - brotli-python=1.1.0=py312h2ec8cdc_2
   - bwidget=1.9.16=h9eba36c_0
   - bzip2=1.0.8=hd590300_5
   - c-ares=1.28.1=hd590300_0
-  - ca-certificates=2024.12.31=h06a4308_0
+  - ca-certificates=2025.2.25=h06a4308_0
   - cairo=1.18.0=hbb29018_2
   - cellsnp-lite=1.2.3=h1a9c9f8_4
-  - certifi=2024.12.14=pyhd8ed1ab_0
+  - certifi=2025.4.26=py312h06a4308_0
   - cffi=1.17.1=py312h06ac9bb_0
   - charset-normalizer=3.4.1=pyhd8ed1ab_0
   - colorama=0.4.6=pyhd8ed1ab_1
@@ -92,7 +94,9 @@ dependencies:
   - hyperframe=6.1.0=pyhd8ed1ab_0
   - icu=73.2=h59595ed_0
   - idna=3.10=pyhd8ed1ab_1
+  - imbalanced-learn=0.13.0=py312h06a4308_0
   - jags=4.3.2=h647a790_1
+  - joblib=1.4.2=py312h06a4308_0
   - jq=1.7.1=hd590300_0
   - jsonpatch=1.33=pyhd8ed1ab_1
   - jsonpointer=3.0.0=py312h7900ff3_1
@@ -147,13 +151,16 @@ dependencies:
   - lzo=2.10=hd590300_1001
   - make=4.3=hd18ef5c_1
   - menuinst=2.2.0=py312h7900ff3_0
+  - msisensor-rna=0.1.6=pyhdfd78af_0
   - ncurses=6.5=h59595ed_0
   - nlohmann_json=3.11.3=he02047a_1
   - nlopt=2.8.0=py312h69683c5_2
+  - numexpr=2.10.1=py312hd28fd6d_0
   - numpy=2.1.2=py312h58c1407_0
   - oniguruma=6.9.9=hd590300_0
   - openssl=3.4.0=h7b32b05_1
   - packaging=24.2=pyhd8ed1ab_2
+  - pandas=2.2.3=py312h6a678d5_0
   - pandoc=3.2.1=ha770c72_0
   - pango=1.54.0=h4c5309f_1
   - pcre2=10.44=h0f59acf_0
@@ -167,7 +174,10 @@ dependencies:
   - pycparser=2.22=pyh29332c3_1
   - pysocks=1.7.1=pyha55dd90_7
   - python=3.12.4=h194c7f8_0_cpython
+  - python-dateutil=2.9.0post0=py312h06a4308_2
+  - python-tzdata=2025.2=pyhd3eb1b0_0
   - python_abi=3.12=4_cp312
+  - pytz=2024.1=py312h06a4308_0
   - pyyaml=6.0.1=py312h98912ed_1
   - r-abind=1.4_5=r43hc72bb7e_1006
   - r-ape=5.8=r43h08d816e_0
@@ -513,11 +523,16 @@ dependencies:
   - requests=2.32.3=pyhd8ed1ab_1
   - ruamel.yaml=0.18.10=py312h66e93f0_0
   - ruamel.yaml.clib=0.2.8=py312h66e93f0_1
+  - scikit-learn=1.6.1=py312h6a678d5_0
+  - scipy=1.15.2=py312h210a465_1
   - sed=4.8=he412f7d_0
   - setuptools=70.1.1=pyhd8ed1ab_0
   - simdjson=3.10.1=h84d6215_0
+  - six=1.17.0=py312h06a4308_0
+  - sklearn-compat=0.1.3=py312h06a4308_0
   - spdlog=1.14.1=hed91bc2_1
   - sysroot_linux-64=2.12=he073ed8_17
+  - threadpoolctl=3.5.0=py312he106c6f_0
   - tk=8.6.13=noxft_h4845f30_101
   - tktable=2.10=h8bc8fbc_6
   - toml=0.10.2=pyhd8ed1ab_0
