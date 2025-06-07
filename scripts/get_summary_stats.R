@@ -27,7 +27,7 @@ int_s_obj <-readRDS(paste0('../integrated_samples/',sample_name,'.rds'))
 source('seurat_interaction.R')
 
 int_s_obj <- add_to_seurat(seurat_obj=int_s_obj,
-infercnv_output_path=paste0('/data3/hanthony/infer_cnv_temp/patient_',sample_name,'/'),top_n=10)
+infercnv_output_path=paste0('../infer_cnv_results/patient_',sample_name,'/'),top_n=10)
 
 int_cancer_obj <- readRDS(paste0('../integrated_samples/',sample_name,'_cancer.rds'))
 
