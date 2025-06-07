@@ -1,0 +1,3 @@
+#### scATOMIC output directory ####
+
+This directory stores intermediary Seurat objects that have been annotated with scATOMIC cell types.
