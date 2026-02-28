@@ -15,7 +15,7 @@ MIT; see LICENSE file for more information.
 Please cite our publication:
  
 Anthony, H., & Seoighe, C. (2026). Intratumoral heterogeneity in microsatellite instability status at single-cell 
-resolution. iScience, 29(3), 114860.
+resolution. *iScience*, 29(3), 114860.
 
 DOI: <https://doi.org/10.1016/j.isci.2026.114860>
 
