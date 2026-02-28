@@ -12,15 +12,18 @@ Alternative and updated contact information can be found on my [website](https:/
 MIT; see LICENSE file for more information.
 
 ### Citation
-Please cite our our publication 
-"Intratumoral heterogeneity in microsatellite instability at single-cell resolution" 
-published in *iScience*. 
+Please cite our publication:
+ 
+Anthony, H., & Seoighe, C. (2026). Intratumoral heterogeneity in microsatellite instability status at single-cell 
+resolution. iScience, 29(3), 114860.
+
+DOI: <https://doi.org/10.1016/j.isci.2026.114860>
 
 ### Repository information
 
 This repository functions as a distribution of the SINGLE-MSI Snakemake pipeline used in our recept manuscript. 
 The results and raw code submitted as part of the publication can be found in the legacy version of this
-repository (https://github.com/harrison-anth/single_msi_legacy).
+repository (<https://github.com/harrison-anth/single_msi_legacy>).
 
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.2, and Cell Ranger 7.2.0.
 
