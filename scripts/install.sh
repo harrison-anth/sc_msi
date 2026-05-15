@@ -30,4 +30,18 @@ if(!require(devtools)) install.packages("devtools")
 if(!require(cutoff.scATOMIC)) devtools::install_github("inofechm/cutoff.scATOMIC", force = T)
 if(!require(scATOMIC)) devtools::install_github("abelson-lab/scATOMIC")'
 
+## Download/unpack Cellranger and reference genome
+wget -O ../references/cellranger-10.0.0.tar.gz "https://cf.10xgenomics.com/releases/cell-exp/cellranger-10.0.0.tar.gz?Expires=1778896846&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA&Signature=D3ppZpRClSubXPpbTSjF7tnBbN1iRJD7JNnWMXmvTZZtU~wmdh8RN0j4qCDszXdo~yZsjYjLbesz14bSlfCqgN2M0HwKc7G731L9kD0s9nKO~ky2b7QoMKSo929BdeLHc6Lex2B7TycmPf~JYkzbj9WPmRsrfDWdmfw7~BMc9A4W214HqGzvlBOU1Gx7aQTmUJ6JsFkt5XBm3F19jqDHapbey1urjzyj1UJx4DlO0gg8jZqJuE4Q3WTCH4SRULXaOFK0Co3lr05-CUVUUVZHycgSnrcCy-ULtbsv-qgc3Wl9H80FInLMMr7C73rwFFbQjzD6JqRwYAwcsOofWi6aDg__"
+
+tar -xzvf ../references/cellranger-10.0.0.tar.gz
+
+wget -O ../references/refdata-gex-GRCh38-2024-A.tar.gz "https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2024-A.tar.gz"
+
+tar -xzvf ../references/refdata-gex-GRCh38-2024-A.tar.gz
+
+## Test installation of SINGLE-MSI
+snakemake -s handle_fastq.snake --cores 1 --use-conda
+
+snakemake -s handle_mtx.snake --cores 1 --use-conda
+
 
