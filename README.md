@@ -27,6 +27,8 @@ repository (<https://github.com/harrison-anth/single_msi_legacy>).
 
 This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.2, and Cell Ranger 7.2.0.
 
+SINGLE-MSI has been tested again with these same software versions using Debian 12.0 on May 15th 2026.
+
 ### Planned pipeline features to be added
 
 * Create separate files for each rule to help users incorporate multi-threading and custom filter/cluster settings
