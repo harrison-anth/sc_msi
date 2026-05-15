@@ -18,7 +18,7 @@ patient_key: "../manifests/fastq_example_key.tsv"
 transcriptome: "../references/refdata-gex-GRCh38-2024-A"
 
 #cellranger path
-cellranger: "/home/administrator/cellranger-7.2.0/bin/cellranger"
+cellranger: "../references/cellranger-7.2.0/bin/cellranger"
 
 # Threshold cut-off for MSI status 
 msi_cutoff: 0.75
