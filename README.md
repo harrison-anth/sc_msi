@@ -113,7 +113,7 @@ re-run previously incomplete rules/files triggered by modification time only**
 **Run MTX Snake file with SLURM executor profile using 30 cores 
 (parallel processing); use Conda environments**
 
- ``` snakemake -s handle_mtx.snake -p ../conda_envs/slurm_executor/ --cores 30 --use-conda --```
+ ``` snakemake -s handle_mtx.snake -p ../conda_envs/slurm_executor/ --cores 30 --use-conda --rerun-incomplete --rerun-triggers mtime```
 
 These are the very basic possible commands with Snakemake. It is recommended to take time to create a custom Snakemake profile to 
 store user settings that enable multi-threading/multi-core processing. There are also many RAM intense applications (Cellranger and InferCNV) 
