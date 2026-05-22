@@ -25,9 +25,10 @@ This repository functions as a distribution of the SINGLE-MSI Snakemake pipeline
 The results and raw code submitted as part of the publication can be found in the legacy version of this
 repository (<https://github.com/harrison-anth/single_msi_legacy>).
 
-This pipeline has been tested on Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.2, and Cell Ranger 7.2.0.
+This pipeline has been tested on virtual machines running Ubuntu 20.04 with Snakemake 8.27.1, Conda 24.1.2, and Cell Ranger 7.2.0.
 
-SINGLE-MSI has been tested again with these same software versions using Debian 12.0 on May 15th 2026.
+These pipeline versions have also been most recently tested again on May 15th 2026 using Debian 12.0 as the operating system. 
+
 
 ### Planned pipeline features to be added
 
@@ -41,11 +42,11 @@ SINGLE-MSI has been tested again with these same software versions using Debian 
 
 * Include additional/supplementary plots that were shown in the manuscript
 
-**Feel free to message me or open an issue with any other suggestions you might have**
+* Allow a greater variety of input file formats to reduce the number of needed steps
+
+** Feel free to reach out regarding a suggested feature or pipeline change **
 
 ### Installation instructions
-
-**NB: As of version 1.01 there is an install.sh script that has all the code necessary to install the pipeline dependencies.**
 
 1.) Download and install the following dependencies: 
 
@@ -56,10 +57,10 @@ SINGLE-MSI has been tested again with these same software versions using Debian 
 **Note: Cell Ranger and reference transcriptome are only necessary for 
 the FASTQ pipeline**
  
-* Cellranger ```wget -O cellranger-10.0.0.tar.gz "https://cf.10xgenomics.com/releases/cell-exp/cellranger-10.0.0.tar.gz?Expires=1778896846&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA&Signature=D3ppZpRClSubXPpbTSjF7tnBbN1iRJD7JNnWMXmvTZZtU~wmdh8RN0j4qCDszXdo~yZsjYjLbesz14bSlfCqgN2M0HwKc7G731L9kD0s9nKO~ky2b7QoMKSo929BdeLHc6Lex2B7TycmPf~JYkzbj9WPmRsrfDWdmfw7~BMc9A4W214HqGzvlBOU1Gx7aQTmUJ6JsFkt5XBm3F19jqDHapbey1urjzyj1UJx4DlO0gg8jZqJuE4Q3WTCH4SRULXaOFK0Co3lr05-CUVUUVZHycgSnrcCy-ULtbsv-qgc3Wl9H80FInLMMr7C73rwFFbQjzD6JqRwYAwcsOofWi6aDg__"```
+* Cellranger ```wget -O cellranger-7.2.0.tar.gz 
+"https://cf.10xgenomics.com/releases/cell-exp/cellranger-7.2.0.tar.gz?Expires=1749374999&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA&Signature=Oi4tu~mQ8B0T3hOUjGgm7Xy8f-Z92tdauD~0D~9M3GbwQKJW7txWVFWr6aQpmfI7mrYTM8965onbhcKNWBI2S9Uu8OYl7c8kWMLCzP1rs8rAeitL~eB~2kqc29NZrT5pnDjIkPTzh1huBj53qXmo7oDopIxdl2~llGwZ3oVd8dJSQfZtPe08NwPnOQgLa0IhD8TplsSf7uHGvyfR9lSBvvICSlkqzkuvKfE56Qg-fV5lRad7jLOjFTZNhPxZ4Mh4FpPuGxr-s2KWBa~OS0~4w3nP3PLUUVl5EjjHfW0XPusv0m-vT1jGskKWjN9Mzx0ttv8ddjNfiU04imz7o8BBfQ__"```
 
-* Reference transcriptome ```wget "https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2024-A.tar.gz"```
-(https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
+* Reference transcriptome (https://www.10xgenomics.com/support/software/cell-ranger/downloads#reference-downloads)
 
 * Change the reference transcriptome path in the config file
 
@@ -71,9 +72,7 @@ the FASTQ pipeline**
 
 3.) Activate the atomic Conda environment and install scATOMIC
 
-* This step can take several minutes and needs to performed within R. 
-* It is also critical at this stage to NOT update the scATOMIC dependencies when prompted as this will overwrite those 
-in the Conda environment.
+https://github.com/abelson-lab/scATOMIC
 
 That's it!
 
