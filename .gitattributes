@@ -1,0 +1,3 @@
+*.html linguist-detectable=false
+*.log linguist-detetable=false
+*.error linguist-detectable=false
